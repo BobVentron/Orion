@@ -1,0 +1,93 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #0d1117;
+  color: #e6edf3;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.container {
+  text-align: center;
+  max-width: 520px;
+  width: 100%;
+}
+
+h1 {
+  font-size: 2.6rem;
+  margin-bottom: 2rem;
+  color: #8b9fff;
+}
+
+.status-card {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 12px;
+  padding: 2.5rem 2rem;
+  margin-bottom: 2rem;
+  transition: all 0.35s ease;
+}
+
+.status-indicator {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1.5rem;
+  border-radius: 50%;
+  background: #444c56;
+  box-shadow: 0 0 25px rgba(0,0,0,0.5);
+  transition: all 0.4s ease;
+}
+
+.status-card.healthy   .status-indicator { background: #238636; box-shadow: 0 0 35px #23863680; }
+.status-card.unhealthy .status-indicator { background: #da3633; box-shadow: 0 0 35px #da363380; }
+.status-card.checking  .status-indicator { background: #444c56; animation: pulse 2s infinite; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; transform: scale(0.95); }
+  50%      { opacity: 1;   transform: scale(1.05); }
+}
+
+h2#status-title {
+  font-size: 2.1rem;
+  margin-bottom: 0.8rem;
+}
+
+#status-message {
+  font-size: 1.15rem;
+  opacity: 0.9;
+  margin-bottom: 1.2rem;
+  min-height: 1.5em;
+}
+
+.last-update {
+  font-size: 0.95rem;
+  opacity: 0.7;
+}
+
+#refresh {
+  background: #388bfd;
+  color: white;
+  border: none;
+  padding: 0.9rem 2.2rem;
+  font-size: 1.05rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+#refresh:hover {
+  background: #1f6feb;
+  transform: translateY(-2px);
+}
+
+#refresh:active {
+  transform: translateY(0);
+}

@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Orion – Mentions légales</title>
+  <link rel="icon" href="assets/icon.svg" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #020617;
+      --primary: #6366f1;
+      --secondary: #a855f7;
+      --border: rgba(255,255,255,0.08);
+      --border-hover: rgba(99,102,241,0.3);
+      --glass: rgba(255,255,255,0.03);
+      --glass2: rgba(255,255,255,0.06);
+      --text: #f1f5f9;
+      --muted: #64748b;
+      --muted2: #94a3b8;
+    }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); overflow-x:hidden; min-height:100vh; }
+    .page { background: var(--bg); min-height: 100vh; }
+
+    nav { position:fixed; top:0; left:0; right:0; z-index:100; padding:0 5%; height:68px; display:flex; align-items:center; justify-content:space-between; background:rgba(2,6,23,0.85); backdrop-filter:blur(20px); border-bottom:1px solid var(--border); }
+    .nav-logo { display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--text); }
+    .nav-logo img { width:28px; height:28px; }
+    .nav-logo span { font-family:'Syne',sans-serif; font-weight:800; font-size:1.2rem; letter-spacing:-0.5px; }
+    .nav-links { display:flex; align-items:center; gap:8px; list-style:none; }
+    .nav-links a { text-decoration:none; color:var(--muted2); font-size:0.875rem; font-weight:500; padding:6px 14px; border-radius:8px; transition:all 0.2s; }
+    .nav-links a:hover { color:var(--text); background:var(--glass2); }
+    .nav-cta { background:linear-gradient(135deg,var(--primary),var(--secondary)) !important; color:white !important; padding:7px 18px !important; border-radius:10px !important; }
+
+    .page { padding-top:88px; max-width:820px; margin:0 auto; padding-left:5%; padding-right:5%; position:relative; z-index:1; }
+
+    .page-header { padding:70px 0 50px; }
+
+    .badge { display:inline-flex; align-items:center; gap:6px; background:rgba(99,102,241,0.12); border:1px solid rgba(99,102,241,0.3); color:#a5b4fc; font-size:0.8rem; font-weight:500; padding:5px 14px; border-radius:100px; margin-bottom:24px; letter-spacing:0.5px; text-transform:uppercase; }
+    .badge::before { content:'◆'; font-size:0.6rem; }
+
+    h1 { font-family:'Syne',sans-serif; font-size:clamp(2rem,4vw,2.8rem); font-weight:800; letter-spacing:-1px; margin-bottom:14px; }
+
+    .page-meta { color:var(--muted2); font-size:0.85rem; }
+    .page-meta strong { color:var(--text); }
+
+    /* TOC */
+    .toc {
+      background:var(--glass); border:1px solid var(--border);
+      border-radius:16px; padding:24px 28px; margin-bottom:40px;
+    }
+
+    .toc-title { font-family:'Syne',sans-serif; font-weight:700; font-size:0.85rem; margin-bottom:14px; color:var(--muted2); letter-spacing:1px; text-transform:uppercase; }
+
+    .toc-list { list-style:none; display:flex; flex-direction:column; gap:6px; }
+    .toc-list a { text-decoration:none; color:var(--muted2); font-size:0.85rem; transition:color 0.2s; display:flex; align-items:center; gap:8px; }
+    .toc-list a:hover { color:var(--primary); }
+    .toc-list a::before { content:'→'; font-size:0.7rem; color:var(--muted); }
+
+    /* SECTIONS */
+    .legal-section { margin-bottom:50px; scroll-margin-top:90px; }
+
+    .legal-section h2 {
+      font-family:'Syne',sans-serif; font-size:1.3rem; font-weight:800;
+      letter-spacing:-0.3px; margin-bottom:20px;
+      padding-bottom:12px; border-bottom:1px solid var(--border);
+      display:flex; align-items:center; gap:10px;
+    }
+
+    .section-num {
+      background:rgba(99,102,241,0.12); color:#a5b4fc;
+      font-size:0.75rem; font-weight:700; width:24px; height:24px;
+      border-radius:6px; display:flex; align-items:center; justify-content:center;
+      flex-shrink:0;
+    }
+
+    .legal-section h3 {
+      font-family:'Syne',sans-serif; font-size:1rem; font-weight:700;
+      margin:24px 0 10px; color:var(--text);
+    }
+
+    .legal-section p {
+      color:var(--muted2); font-size:0.875rem; line-height:1.8; margin-bottom:14px;
+    }
+
+    .legal-section p:last-child { margin-bottom:0; }
+
+    .legal-section ul {
+      list-style:none; margin:12px 0;
+    }
+
+    .legal-section ul li {
+      color:var(--muted2); font-size:0.875rem; line-height:1.7;
+      padding-left:20px; position:relative; margin-bottom:6px;
+    }
+
+    .legal-section ul li::before { content:'–'; position:absolute; left:0; color:var(--muted); }
+
+    .info-box {
+      background:var(--glass2); border:1px solid var(--border);
+      border-radius:12px; padding:20px 24px; margin:16px 0;
+    }
+
+    .info-box p { margin-bottom:0; }
+
+    .info-row {
+      display:flex; gap:12px; justify-content:space-between; flex-wrap:wrap;
+      font-size:0.875rem; margin-bottom:8px;
+    }
+
+    .info-row:last-child { margin-bottom:0; }
+
+    .info-key { color:var(--muted2); font-weight:500; min-width:160px; }
+    .info-val { color:var(--text); font-weight:500; }
+
+    .license-badge {
+      display:inline-flex; align-items:center; gap:8px;
+      background:rgba(20,184,166,0.08); border:1px solid rgba(20,184,166,0.2);
+      border-radius:12px; padding:12px 16px; margin:16px 0;
+      font-size:0.85rem;
+    }
+
+    .license-badge .lb-icon { font-size:1.2rem; }
+    .license-badge .lb-name { font-family:'Syne',sans-serif; font-weight:700; color:#5eead4; }
+    .license-badge .lb-desc { color:var(--muted2); font-size:0.78rem; margin-top:1px; }
+
+    .contact-block {
+      background:linear-gradient(135deg,rgba(99,102,241,0.06),rgba(168,85,247,0.04));
+      border:1px solid rgba(99,102,241,0.2); border-radius:14px;
+      padding:20px 24px; margin:16px 0;
+    }
+
+    .contact-block p { margin-bottom:8px; }
+    .contact-block p:last-child { margin-bottom:0; }
+    .contact-block a { color:#a5b4fc; text-decoration:none; }
+    .contact-block a:hover { text-decoration:underline; }
+
+    .update-note {
+      background:rgba(245,158,11,0.06); border:1px solid rgba(245,158,11,0.15);
+      border-radius:10px; padding:12px 16px; margin-top:40px;
+      font-size:0.8rem; color:var(--muted2);
+      display:flex; gap:8px; align-items:flex-start;
+    }
+
+    footer { border-top:1px solid var(--border); padding:40px 5%; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px; }
+    .footer-logo { display:flex; align-items:center; gap:8px; text-decoration:none; color:var(--muted2); font-size:0.875rem; }
+    .footer-logo img { width:20px; opacity:0.6; }
+    .footer-links { display:flex; gap:24px; list-style:none; }
+    .footer-links a { text-decoration:none; color:var(--muted); font-size:0.8rem; transition:color 0.2s; }
+    .footer-links a:hover { color:var(--muted2); }
+    .footer-copy { color:var(--muted); font-size:0.8rem; }
+
+    @media(max-width:768px) { .nav-links { display:none; } .info-row { flex-direction:column; gap:4px; } }
+  </style>
+</head>
+<body>
+  <!-- DARK/LIGHT THEME TOGGLE -->
+  <button id="theme-toggle" onclick="toggleTheme()" title="Changer le thème">
+    <span id="theme-icon">☀️</span>
+  </button>
+  <style>
+    #theme-toggle {
+      position: fixed; top: 16px; right: 20px; z-index: 500;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 10px; width: 38px; height: 38px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 1rem; transition: all 0.2s;
+      backdrop-filter: blur(8px);
+    }
+    #theme-toggle:hover { background: rgba(255,255,255,0.12); transform: scale(1.08); }
+    body.light {
+      --bg: #f8fafc !important; --bg2: #f1f5f9 !important;
+      --text: #0f172a !important; --muted: #94a3b8 !important;
+      --muted2: #64748b !important; --border: rgba(0,0,0,0.09) !important;
+      --border-hover: rgba(99,102,241,0.4) !important;
+      --glass: rgba(0,0,0,0.025) !important; --glass2: rgba(0,0,0,0.05) !important;
+      background: #f8fafc !important; color: #0f172a !important;
+    }
+    body.light nav { background: rgba(248,250,252,0.92) !important; }
+    body.light footer { background: transparent; }
+    body.light #theme-toggle { background: rgba(0,0,0,0.06); border-color: rgba(0,0,0,0.1); }
+    body.light::before { opacity: 0.35 !important; }
+  </style>
+  <script>
+    (function(){
+      var saved = localStorage.getItem("orion-theme");
+      if (saved === "light") {
+        document.body.classList.add("light");
+        var el = document.getElementById("theme-icon");
+        if (el) el.textContent = "🌙";
+      }
+    })();
+    function toggleTheme() {
+      var isLight = document.body.classList.toggle("light");
+      document.getElementById("theme-icon").textContent = isLight ? "🌙" : "☀️";
+      localStorage.setItem("orion-theme", isLight ? "light" : "dark");
+    }
+  </script>
+
+
+  <nav>
+    <a class="nav-logo" href="index.html">
+      <img src="assets/icon.svg" alt="Orion" />
+      <span>Orion</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="features.html">Fonctionnalités</a></li>
+      <li><a href="pricing.html">Tarification</a></li>
+      <li><a href="roadmap.html">Roadmap</a></li>
+      <li><a href="comparatif.html">Comparatif</a></li>
+      <li><a href="about.html">À propos</a></li>
+      <li><a href="docs.html" class="nav-cta">Documentation →</a></li>
+    </ul>
+  </nav>
+
+  <div class="page">
+
+    <div class="page-header">
+      <div class="badge">Légal</div>
+      <h1>Mentions légales &amp; Licence</h1>
+      <p class="page-meta">Dernière mise à jour : <strong>Avril 2026</strong> — Version du logiciel : <strong>0.2-9</strong></p>
+    </div>
+
+    <!-- TOC -->
+    <nav class="toc">
+      <div class="toc-title">Sommaire</div>
+      <ul class="toc-list">
+        <li><a href="#editeur">Éditeur du logiciel</a></li>
+        <li><a href="#hebergement">Hébergement du site vitrine</a></li>
+        <li><a href="#licence">Licence open-source</a></li>
+        <li><a href="#donnees">Protection des données personnelles</a></li>
+        <li><a href="#confidentialite">Politique de confidentialité</a></li>
+        <li><a href="#responsabilite">Limitation de responsabilité</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+
+    <!-- 1 EDITEUR -->
+    <section class="legal-section" id="editeur">
+      <h2><span class="section-num">1</span>Éditeur du logiciel</h2>
+      <p>Le logiciel Orion est développé et maintenu par l'équipe <strong style="color:var(--text)">DuckInc</strong>, dans le cadre d'un projet académique et professionnel.</p>
+
+      <div class="info-box">
+        <div class="info-row"><span class="info-key">Nom du projet</span><span class="info-val">Orion — Outil de Cartographie Réseau</span></div>
+        <div class="info-row"><span class="info-key">Organisation</span><span class="info-val">DuckInc — Équipe Orion</span></div>
+        <div class="info-row"><span class="info-key">Cadre de développement</span><span class="info-val">BUT Réseaux & Télécommunications, IUT de Valence</span></div>
+        <div class="info-row"><span class="info-key">Responsable principal</span><span class="info-val">Bastien Soleilhac</span></div>
+        <div class="info-row"><span class="info-key">Contact</span><span class="info-val">bastien@soleilhac.me</span></div>
+        <div class="info-row"><span class="info-key">Version actuelle</span><span class="info-val">0.2-9 (Avril 2026)</span></div>
+      </div>
+
+      <p>L'équipe est composée de Bastien Soleilhac, Jade Degaugue, Alexis Lonjon et Michel Bermond, étudiants en alternance à l'IUT de Valence (Université Grenoble Alpes).</p>
+    </section>
+
+    <!-- 2 HEBERGEMENT -->
+    <section class="legal-section" id="hebergement">
+      <h2><span class="section-num">2</span>Hébergement du site vitrine</h2>
+      <p>Le site de présentation d'Orion (<code style="font-size:0.8rem;background:var(--glass2);padding:1px 6px;border-radius:4px">orion.duckinc.soleilhac.me</code>) est hébergé sur une infrastructure propre à DuckInc.</p>
+
+      <div class="info-box">
+        <div class="info-row"><span class="info-key">Prestataire d'hébergement</span><span class="info-val">OVHcloud SAS</span></div>
+        <div class="info-row"><span class="info-key">Adresse OVH</span><span class="info-val">2 rue Kellermann, 59100 Roubaix, France</span></div>
+        <div class="info-row"><span class="info-key">Infrastructure</span><span class="info-val">Serveur physique dédié — Proxmox VE</span></div>
+        <div class="info-row"><span class="info-key">Serveur web</span><span class="info-val">Nginx (VM Web-Tabit, 192.168.1.5)</span></div>
+        <div class="info-row"><span class="info-key">Certificats TLS</span><span class="info-val">Let's Encrypt (renouvellement automatique 90j)</span></div>
+      </div>
+    </section>
+
+    <!-- 3 LICENCE -->
+    <section class="legal-section" id="licence">
+      <h2><span class="section-num">3</span>Licence open-source</h2>
+      <p>Le logiciel Orion est distribué sous licence open-source. Vous êtes libre de l'utiliser, le modifier et le redistribuer selon les termes de cette licence.</p>
+
+      <div class="license-badge">
+        <div class="lb-icon">⚖️</div>
+        <div>
+          <div class="lb-name">MIT License</div>
+          <div class="lb-desc">Libre d'utilisation, de modification et de redistribution</div>
+        </div>
+      </div>
+
+      <h3>Résumé de la licence MIT</h3>
+      <ul>
+        <li>Vous pouvez utiliser Orion à des fins commerciales ou non-commerciales</li>
+        <li>Vous pouvez modifier le code source</li>
+        <li>Vous pouvez redistribuer le logiciel original ou modifié</li>
+        <li>Vous devez inclure la notice de copyright et la licence dans toute copie</li>
+        <li>Le logiciel est fourni "tel quel", sans garantie d'aucune sorte</li>
+      </ul>
+
+      <h3>Notice de copyright</h3>
+      <div class="info-box">
+        <p style="font-family:monospace;font-size:0.8rem;color:var(--muted2);line-height:1.8">
+          Copyright (c) 2026 DuckInc — Équipe Orion<br>
+          Bastien Soleilhac, Jade Degaugue, Alexis Lonjon, Michel Bermond<br><br>
+          Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software.
+        </p>
+      </div>
+
+      <h3>Licences des dépendances</h3>
+      <p>Orion utilise des composants tiers dont les licences sont compatibles avec la licence MIT. Les principales dépendances et leurs licences :</p>
+      <ul>
+        <li>PostgreSQL 16 — Licence PostgreSQL (type MIT)</li>
+        <li>Node.js / Express.js 5 — Licence MIT</li>
+        <li>Python 3.12 / psycopg2 / netmiko — LGPL / MIT / MIT</li>
+        <li>Nginx Alpine — Licence BSD 2-Clause</li>
+        <li>Docker Engine — Licence Apache 2.0</li>
+        <li>D3.js v7 — Licence BSD 3-Clause</li>
+        <li>Chart.js — Licence MIT</li>
+      </ul>
+    </section>
+
+    <!-- 4 DONNEES -->
+    <section class="legal-section" id="donnees">
+      <h2><span class="section-num">4</span>Protection des données personnelles</h2>
+
+      <h3>Données collectées par le logiciel Orion</h3>
+      <p>Orion est un logiciel <strong style="color:var(--text)">100% on-premise</strong>. Toutes les données collectées par le logiciel (topologie réseau, inventaire des équipements, métriques de performance, adresses IP, adresses MAC) sont stockées exclusivement sur le serveur du client. <strong style="color:var(--text)">Aucune donnée ne transite vers les serveurs de DuckInc.</strong></p>
+
+      <h3>Données collectées par ce site vitrine</h3>
+      <p>Le site de présentation <code style="font-size:0.8rem;background:var(--glass2);padding:1px 6px;border-radius:4px">orion.duckinc.soleilhac.me</code> ne collecte <strong style="color:var(--text)">aucune donnée personnelle</strong>. Il n'y a :</p>
+      <ul>
+        <li>Aucun cookie de tracking ou publicitaire</li>
+        <li>Aucun outil d'analytics tiers (Google Analytics, etc.)</li>
+        <li>Aucun formulaire de collecte de données personnelles</li>
+        <li>Aucun pixel de tracking ou beacon</li>
+      </ul>
+
+      <p>Les logs serveur Nginx standards (adresse IP, user-agent, page visitée, horodatage) sont conservés 30 jours sur le serveur Web-Tabit pour des raisons de sécurité opérationnelle, puis supprimés automatiquement.</p>
+
+      <h3>Responsable de traitement</h3>
+      <p>Dans le contexte du logiciel Orion, le responsable de traitement des données réseau est l'<strong style="color:var(--text)">organisation cliente</strong> qui installe et exploite le logiciel sur son infrastructure. DuckInc n'a accès à aucune donnée collectée par une instance Orion installée chez un client.</p>
+    </section>
+
+    <!-- 5 CONFIDENTIALITE -->
+    <section class="legal-section" id="confidentialite">
+      <h2><span class="section-num">5</span>Politique de confidentialité</h2>
+
+      <h3>Droit d'accès, de rectification et de suppression</h3>
+      <p>Conformément au Règlement Général sur la Protection des Données (RGPD — Règlement UE 2016/679), vous disposez d'un droit d'accès, de rectification et de suppression des données vous concernant. Pour exercer ces droits, contactez l'équipe DuckInc à l'adresse indiquée en section 7.</p>
+
+      <h3>Données des utilisateurs du logiciel</h3>
+      <p>Les comptes utilisateurs créés dans une instance Orion (table <code style="font-size:0.8rem;background:var(--glass2);padding:1px 6px;border-radius:4px">app_users</code>) sont gérés par l'administrateur de cette instance. Les mots de passe sont stockés sous forme hachée. DuckInc n'a aucun accès à ces données.</p>
+
+      <h3>Transferts de données</h3>
+      <p>Aucun transfert de données personnelles n'est effectué vers des pays tiers dans le cadre du fonctionnement d'Orion. Le dépôt APT hébergé sur OVH (France) ne contient que des fichiers binaires du logiciel — aucune donnée personnelle.</p>
+    </section>
+
+    <!-- 6 RESPONSABILITE -->
+    <section class="legal-section" id="responsabilite">
+      <h2><span class="section-num">6</span>Limitation de responsabilité</h2>
+
+      <p>Orion est fourni <strong style="color:var(--text)">"tel quel"</strong>, sans garantie explicite ou implicite. En particulier :</p>
+
+      <ul>
+        <li>DuckInc ne garantit pas que le logiciel sera exempt d'erreurs ou d'interruptions</li>
+        <li>L'utilisation d'Orion en environnement de production reste sous la responsabilité de l'administrateur système qui le déploie</li>
+        <li>Les informations collectées par Orion reflètent l'état du réseau au moment de la collecte — elles peuvent ne pas être exactes en temps réel</li>
+        <li>DuckInc décline toute responsabilité pour les dommages résultant de l'utilisation ou de l'impossibilité d'utilisation du logiciel</li>
+        <li>La commande <code style="font-size:0.8rem;background:var(--glass2);padding:1px 6px;border-radius:4px">orion-control clear</code> supprime définitivement les données — l'utilisateur est seul responsable de ses sauvegardes</li>
+      </ul>
+
+      <p>Ces limitations sont conformes aux termes de la licence MIT sous laquelle Orion est distribué.</p>
+    </section>
+
+    <!-- 7 CONTACT -->
+    <section class="legal-section" id="contact">
+      <h2><span class="section-num">7</span>Contact</h2>
+      <p>Pour toute question relative aux présentes mentions légales, à la licence ou à la politique de confidentialité :</p>
+
+      <div class="contact-block">
+        <p>📧 <strong style="color:var(--text)">Contact général :</strong> <a href="mailto:contact@duckinc.fr">contact@duckinc.fr</a></p>
+        <p>🔐 <strong style="color:var(--text)">Signalement sécurité :</strong> <a href="mailto:security@duckinc.fr">security@duckinc.fr</a></p>
+        <p>⚖️ <strong style="color:var(--text)">Questions légales :</strong> <a href="mailto:legal@duckinc.fr">legal@duckinc.fr</a></p>
+        <p>🌐 <strong style="color:var(--text)">Site :</strong> <a href="https://orion.duckinc.soleilhac.me">orion.duckinc.soleilhac.me</a></p>
+      </div>
+    </section>
+
+    <div class="update-note">
+      <span>⏱️</span>
+      <div>Ces mentions légales peuvent être mises à jour à tout moment. La date de dernière modification est indiquée en haut de page. En cas de modification substantielle, une notice sera publiée sur le site.</div>
+    </div>
+
+    <div style="height:60px"></div>
+
+  </div>
+
+  <footer>
+    <a class="footer-logo" href="index.html">
+      <img src="assets/icon.svg" alt="Orion" />
+      Orion — DuckInc
+    </a>
+    <ul class="footer-links">
+      <li><a href="features.html">Fonctionnalités</a></li>
+      <li><a href="roadmap.html">Roadmap</a></li>
+      <li><a href="docs.html">Docs</a></li>
+      <li><a href="about.html">À propos</a></li>
+    </ul>
+    <span class="footer-copy">© 2026 DuckInc — Équipe Orion</span>
+  </footer>
+
+</body>
+</html>

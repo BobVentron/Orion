@@ -1,0 +1,20 @@
+User-agent: *
+Allow: /
+
+# Pages publiques indexables
+Allow: /index.html
+Allow: /features.html
+Allow: /pricing.html
+Allow: /roadmap.html
+Allow: /comparatif.html
+Allow: /about.html
+Allow: /docs.html
+Allow: /legal.html
+
+# Assets
+Allow: /assets/
+
+# Ne pas indexer la page WIP
+Disallow: /WIP.html
+
+Sitemap: https://orion.duckinc.soleilhac.me/sitemap.xml

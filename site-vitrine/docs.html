@@ -1,0 +1,1698 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Documentation – Orion</title>
+  <link rel="icon" href="assets/icon.svg" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #020617;
+      --bg-elevated: #0d1526;
+      --glass: rgba(255,255,255,0.04);
+      --glass-hover: rgba(255,255,255,0.07);
+      --border: rgba(255,255,255,0.09);
+      --border-strong: rgba(255,255,255,0.15);
+      --primary: #6366f1;
+      --primary-glow: rgba(99,102,241,0.25);
+      --secondary: #a855f7;
+      --accent: #38bdf8;
+      --success: #34d399;
+      --warning: #fbbf24;
+      --danger: #f87171;
+      --text: #f1f5f9;
+      --text-muted: #64748b;
+      --text-soft: #94a3b8;
+      --sidebar-w: 280px;
+      --topbar-h: 60px;
+      --code-bg: #0a0f1e;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ─── TOPBAR ─── */
+    .topbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--topbar-h);
+      background: rgba(2,6,23,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 16px;
+      z-index: 100;
+    }
+
+    .topbar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: -0.5px;
+    }
+
+    .topbar-logo img { width: 26px; height: 26px; }
+
+    .topbar-badge {
+      font-size: .7rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      padding: 2px 8px;
+      border-radius: 20px;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+    }
+
+    .topbar-nav {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .topbar-nav a {
+      color: var(--text-soft);
+      text-decoration: none;
+      font-size: .9rem;
+      padding: 6px 14px;
+      border-radius: 8px;
+      transition: all .2s;
+    }
+
+    .topbar-nav a:hover { color: var(--text); background: var(--glass-hover); }
+    .topbar-nav a.active { color: var(--text); background: var(--glass-hover); }
+
+    .hamburger {
+      display: none;
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      margin-left: auto;
+    }
+
+    /* ─── LAYOUT ─── */
+    .layout {
+      display: flex;
+      width: 100vw;
+      padding-top: var(--topbar-h);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ─── SIDEBAR ─── */
+    .sidebar {
+      width: var(--sidebar-w);
+      flex-shrink: 0;
+      position: fixed;
+      top: var(--topbar-h);
+      bottom: 0;
+      left: 0;
+      overflow-y: auto;
+      background: rgba(10,15,30,0.6);
+      border-right: 1px solid var(--border);
+      padding: 28px 16px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-track { background: transparent; }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    .sidebar-section {
+      margin-bottom: 28px;
+    }
+
+    .sidebar-label {
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 0 12px;
+      margin-bottom: 6px;
+    }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      color: var(--text-soft);
+      text-decoration: none;
+      font-size: .875rem;
+      font-weight: 400;
+      transition: all .15s;
+      cursor: pointer;
+    }
+
+    .sidebar-link:hover {
+      color: var(--text);
+      background: var(--glass-hover);
+    }
+
+    .sidebar-link.active {
+      color: var(--text);
+      background: rgba(99,102,241,0.12);
+      font-weight: 500;
+    }
+
+    .sidebar-link.active::before {
+      content: '';
+      position: absolute;
+      left: 16px;
+      width: 2px;
+      height: 18px;
+      background: var(--primary);
+      border-radius: 2px;
+    }
+
+    .sidebar-link { position: relative; }
+
+    .sidebar-link .icon {
+      width: 18px;
+      text-align: center;
+      font-size: .9rem;
+      flex-shrink: 0;
+    }
+
+    /* ─── MAIN CONTENT ─── */
+    .content {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      min-width: 0;
+      padding: 0 0 100px;
+    }
+
+    .content > article {
+      padding: 56px 60px 0;
+    }
+
+    /* ─── SECTION PAGES ─── */
+    .doc-page { display: none; }
+    .doc-page.visible { display: block; }
+
+    /* ─── HEADINGS ─── */
+    .page-header {
+      margin-bottom: 48px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .page-eyebrow {
+      font-size: .75rem;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: 12px;
+    }
+
+    .page-title {
+      font-size: 2.4rem;
+      font-weight: 900;
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+
+    .page-desc {
+      font-size: 1.05rem;
+      color: var(--text-soft);
+      max-width: 580px;
+      line-height: 1.7;
+    }
+
+    h2 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin: 48px 0 16px;
+      padding-top: 8px;
+    }
+
+    h2::before {
+      content: '';
+      display: inline-block;
+      width: 3px;
+      height: 1em;
+      background: linear-gradient(180deg, var(--primary), var(--secondary));
+      border-radius: 2px;
+      margin-right: 10px;
+      vertical-align: middle;
+      transform: translateY(-1px);
+    }
+
+    h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-soft);
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      font-size: .8rem;
+      margin: 32px 0 12px;
+    }
+
+    p {
+      color: var(--text-soft);
+      line-height: 1.75;
+      font-size: .95rem;
+      margin-bottom: 16px;
+    }
+
+    /* ─── STEPS ─── */
+    .steps {
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .step {
+      display: flex;
+      gap: 20px;
+      position: relative;
+    }
+
+    .step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 17px;
+      top: 40px;
+      bottom: -8px;
+      width: 1px;
+      background: linear-gradient(180deg, var(--primary) 0%, transparent 100%);
+      opacity: .3;
+    }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      background: rgba(99,102,241,0.15);
+      border: 1px solid rgba(99,102,241,0.3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .8rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-top: 4px;
+    }
+
+    .step-body {
+      flex: 1;
+      padding-bottom: 28px;
+    }
+
+    .step-title {
+      font-size: .95rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    .step-desc {
+      font-size: .875rem;
+      color: var(--text-soft);
+      margin-bottom: 12px;
+      line-height: 1.6;
+    }
+
+    /* ─── CODE BLOCKS ─── */
+    .code-block {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin: 12px 0 20px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+    }
+
+    .code-lang {
+      font-size: .7rem;
+      font-weight: 600;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .code-copy {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: .7rem;
+      font-family: 'Inter', sans-serif;
+      padding: 3px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all .2s;
+      letter-spacing: .3px;
+    }
+
+    .code-copy:hover { color: var(--text); border-color: var(--border-strong); }
+    .code-copy.copied { color: var(--success); border-color: var(--success); }
+
+    pre {
+      padding: 18px 20px;
+      font-size: .82rem;
+      line-height: 1.7;
+      overflow-x: auto;
+      color: #c9d1d9;
+    }
+
+    pre .comment { color: var(--text-muted); font-style: italic; }
+    pre .cmd { color: #79c0ff; }
+    pre .flag { color: #ffa657; }
+    pre .string { color: #a5d6ff; }
+    pre .keyword { color: var(--secondary); }
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .82em;
+      background: rgba(99,102,241,0.12);
+      border: 1px solid rgba(99,102,241,0.2);
+      padding: 2px 6px;
+      border-radius: 5px;
+      color: #a5b4fc;
+    }
+
+    /* ─── CALLOUTS ─── */
+    .callout {
+      display: flex;
+      gap: 14px;
+      padding: 16px 18px;
+      border-radius: 10px;
+      margin: 16px 0;
+      font-size: .875rem;
+      line-height: 1.6;
+    }
+
+    .callout-icon { flex-shrink: 0; font-size: 1rem; margin-top: 1px; }
+    .callout-body { color: var(--text-soft); }
+    .callout-body strong { color: var(--text); display: block; margin-bottom: 3px; font-size: .875rem; }
+
+    .callout.info { background: rgba(56,189,248,0.07); border: 1px solid rgba(56,189,248,0.2); }
+    .callout.info .callout-icon { color: var(--accent); }
+    .callout.warning { background: rgba(251,191,36,0.07); border: 1px solid rgba(251,191,36,0.2); }
+    .callout.warning .callout-icon { color: var(--warning); }
+    .callout.danger { background: rgba(248,113,113,0.07); border: 1px solid rgba(248,113,113,0.2); }
+    .callout.danger .callout-icon { color: var(--danger); }
+    .callout.success { background: rgba(52,211,153,0.07); border: 1px solid rgba(52,211,153,0.2); }
+    .callout.success .callout-icon { color: var(--success); }
+
+    /* ─── GRID CARDS ─── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin: 20px 0;
+    }
+
+    .info-card {
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+    }
+
+    .info-card-label {
+      font-size: .7rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .info-card-value {
+      font-size: .95rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .info-card-sub {
+      font-size: .8rem;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    /* ─── TABLE ─── */
+    .doc-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .875rem;
+      margin: 16px 0 24px;
+    }
+
+    .doc-table th {
+      text-align: left;
+      padding: 10px 14px;
+      font-size: .7rem;
+      font-weight: 600;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .doc-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      color: var(--text-soft);
+      vertical-align: top;
+    }
+
+    .doc-table tr:hover td { background: var(--glass); }
+
+    .doc-table td:first-child {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .8rem;
+      color: #a5b4fc;
+    }
+
+    /* ─── BADGE ─── */
+    .badge {
+      display: inline-block;
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+
+    .badge.green { background: rgba(52,211,153,0.12); color: var(--success); border: 1px solid rgba(52,211,153,0.25); }
+    .badge.yellow { background: rgba(251,191,36,0.12); color: var(--warning); border: 1px solid rgba(251,191,36,0.25); }
+    .badge.red { background: rgba(248,113,113,0.12); color: var(--danger); border: 1px solid rgba(248,113,113,0.25); }
+    .badge.blue { background: rgba(99,102,241,0.12); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.25); }
+
+    /* ─── DIVIDER ─── */
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 48px 0;
+    }
+
+    /* ─── PREV/NEXT ─── */
+    .doc-nav {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 60px;
+      padding-top: 32px;
+      border-top: 1px solid var(--border);
+    }
+
+    .doc-nav-link {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 16px 20px;
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all .2s;
+      min-width: 160px;
+      flex: 1;
+    }
+
+    .doc-nav-link:hover {
+      background: var(--glass-hover);
+      border-color: var(--border-strong);
+    }
+
+    .doc-nav-link.next { text-align: right; }
+
+    .doc-nav-dir {
+      font-size: .7rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .doc-nav-title {
+      font-size: .95rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    /* ─── STARS ─── */
+    #stars {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* ─── MOBILE ─── */
+    @media (min-width: 901px) and (max-width: 1280px) {
+      .content > article { padding: 0 36px; }
+    }
+
+    @media (max-width: 900px) {
+      .sidebar {
+        transform: translateX(-100%);
+        transition: transform .25s ease;
+        z-index: 90;
+      }
+      .sidebar.open { transform: translateX(0); }
+      .content { margin-left: 0; padding: 0 0 80px; }
+      .content > article { padding: 32px 20px; }
+      .hamburger { display: block; }
+      .topbar-nav { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <!-- DARK/LIGHT THEME TOGGLE -->
+  <button id="theme-toggle" onclick="toggleTheme()" title="Changer le thème">
+    <span id="theme-icon">☀️</span>
+  </button>
+  <style>
+    #theme-toggle {
+      position: fixed; top: 16px; right: 20px; z-index: 500;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 10px; width: 38px; height: 38px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 1rem; transition: all 0.2s;
+      backdrop-filter: blur(8px);
+    }
+    #theme-toggle:hover { background: rgba(255,255,255,0.12); transform: scale(1.08); }
+    body.light {
+      --bg: #f8fafc !important; --bg2: #f1f5f9 !important;
+      --text: #0f172a !important; --muted: #94a3b8 !important;
+      --muted2: #64748b !important; --border: rgba(0,0,0,0.09) !important;
+      --border-hover: rgba(99,102,241,0.4) !important;
+      --glass: rgba(0,0,0,0.025) !important; --glass2: rgba(0,0,0,0.05) !important;
+      background: #f8fafc !important; color: #0f172a !important;
+    }
+    body.light nav { background: rgba(248,250,252,0.92) !important; }
+    body.light footer { background: transparent; }
+    body.light #theme-toggle { background: rgba(0,0,0,0.06); border-color: rgba(0,0,0,0.1); }
+    body.light::before { opacity: 0.35 !important; }
+  </style>
+  <script>
+    (function(){
+      var saved = localStorage.getItem("orion-theme");
+      if (saved === "light") {
+        document.body.classList.add("light");
+        var el = document.getElementById("theme-icon");
+        if (el) el.textContent = "🌙";
+      }
+    })();
+    function toggleTheme() {
+      var isLight = document.body.classList.toggle("light");
+      document.getElementById("theme-icon").textContent = isLight ? "🌙" : "☀️";
+      localStorage.setItem("orion-theme", isLight ? "light" : "dark");
+    }
+  </script>
+
+
+  <canvas id="stars"></canvas>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <a class="topbar-logo" href="index.html">
+      <img src="assets/icon.svg" alt="Orion" />
+      Orion
+    </a>
+    <span class="topbar-badge">docs</span>
+    <nav class="topbar-nav">
+      <a href="index.html">Accueil</a>
+      <a href="docs.html" class="active">Documentation</a>
+    </nav>
+    <button class="hamburger" id="hamburgerBtn">☰</button>
+  </header>
+
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">Démarrage</div>
+        <a class="sidebar-link active" onclick="showPage('introduction')">
+          <span class="icon">✦</span> Introduction
+        </a>
+        <a class="sidebar-link" onclick="showPage('prerequisites')">
+          <span class="icon">⬡</span> Prérequis
+        </a>
+        <a class="sidebar-link" onclick="showPage('installation')">
+          <span class="icon">↓</span> Installation
+        </a>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">Administration</div>
+        <a class="sidebar-link" onclick="showPage('orion-control')">
+          <span class="icon">⌘</span> orion-control
+        </a>
+        <a class="sidebar-link" onclick="showPage('configuration')">
+          <span class="icon">◈</span> Configuration
+        </a>
+        <a class="sidebar-link" onclick="showPage('maintenance')">
+          <span class="icon">↻</span> Maintenance & mises à jour
+        </a>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">Opérations</div>
+        <a class="sidebar-link" onclick="showPage('backup')">
+          <span class="icon">◫</span> Sauvegarde & restauration
+        </a>
+        <a class="sidebar-link" onclick="showPage('monitoring')">
+          <span class="icon">◉</span> Monitoring & logs
+        </a>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">Diagnostic</div>
+        <a class="sidebar-link" onclick="showPage('troubleshooting')">
+          <span class="icon">⚑</span> Résolution de problèmes
+        </a>
+      </div>
+
+    </aside>
+
+    <!-- CONTENT -->
+    <main class="content">
+
+      <!-- INTRODUCTION -->
+      <article class="doc-page visible" id="page-introduction">
+        <div class="page-header">
+          <div class="page-eyebrow">Documentation</div>
+          <h1 class="page-title">Bienvenue dans Orion</h1>
+          <p class="page-desc">Tout ce qu'il faut pour installer, configurer et maintenir une instance Orion en production.</p>
+        </div>
+
+        <div class="card-grid">
+          <div class="info-card">
+            <div class="info-card-label">Durée d'installation</div>
+            <div class="info-card-value">10 – 15 min</div>
+            <div class="info-card-sub">Connexion internet requise</div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-label">RAM recommandée</div>
+            <div class="info-card-value">4 Go minimum</div>
+            <div class="info-card-sub">8 Go pour le confort</div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-label">Espace disque</div>
+            <div class="info-card-value">20 Go minimum</div>
+            <div class="info-card-sub">Hors données de supervision</div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-label">Runtime</div>
+            <div class="info-card-value">Docker Engine</div>
+            <div class="info-card-sub">+ Docker Compose v2</div>
+          </div>
+        </div>
+
+        <h2>Présentation de la stack</h2>
+        <p>Orion est distribuée sous forme d'un paquet Debian qui pilote une stack Docker composée de quatre conteneurs :</p>
+
+        <table class="doc-table">
+          <thead>
+            <tr>
+              <th>Conteneur</th>
+              <th>Rôle</th>
+              <th>Port</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>orion_web</td>
+              <td>Interface web (Nginx + frontend statique)</td>
+              <td>80</td>
+            </tr>
+            <tr>
+              <td>orion_api</td>
+              <td>API REST Node.js</td>
+              <td>3000 (interne)</td>
+            </tr>
+            <tr>
+              <td>orion_clt</td>
+              <td>Module de collecte réseau (CLT)</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td>orion_db</td>
+              <td>Base de données PostgreSQL 16</td>
+              <td>5432 (interne)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout info">
+          <span class="callout-icon">ℹ</span>
+          <div class="callout-body">
+            <strong>Architecture réseau</strong>
+            Les conteneurs <code>orion_db</code> et <code>orion_api</code> ne sont pas exposés sur l'hôte. Seul <code>orion_web</code> est accessible depuis l'extérieur.
+          </div>
+        </div>
+
+        <div class="doc-nav">
+          <div></div>
+          <a class="doc-nav-link next" onclick="showPage('prerequisites')">
+            <span class="doc-nav-dir">Suivant →</span>
+            <span class="doc-nav-title">Prérequis</span>
+          </a>
+        </div>
+      </article>
+
+      <!-- PREREQUISITES -->
+      <article class="doc-page" id="page-prerequisites">
+        <div class="page-header">
+          <div class="page-eyebrow">Démarrage</div>
+          <h1 class="page-title">Prérequis</h1>
+          <p class="page-desc">Ce qu'il faut vérifier avant de lancer l'installation.</p>
+        </div>
+
+        <h2>Système d'exploitation</h2>
+        <p>Orion est conçu pour fonctionner sur Debian et Ubuntu. Les distributions testées et supportées :</p>
+
+        <table class="doc-table">
+          <thead>
+            <tr><th>Distribution</th><th>Version</th><th>Statut</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Debian</td>
+              <td>11 (Bullseye), 12 (Bookworm)</td>
+              <td><span class="badge green">Supporté</span></td>
+            </tr>
+            <tr>
+              <td>Ubuntu</td>
+              <td>22.04 LTS, 24.04 LTS</td>
+              <td><span class="badge green">Supporté</span></td>
+            </tr>
+            <tr>
+              <td>Autres distributions</td>
+              <td>—</td>
+              <td><span class="badge yellow">Non testé</span></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>Ressources matérielles</h2>
+
+        <div class="card-grid">
+          <div class="info-card">
+            <div class="info-card-label">CPU</div>
+            <div class="info-card-value">2 vCPU</div>
+            <div class="info-card-sub">Minimum absolu</div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-label">RAM</div>
+            <div class="info-card-value">4 Go</div>
+            <div class="info-card-sub">8 Go recommandés</div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-label">Stockage</div>
+            <div class="info-card-value">20 Go</div>
+            <div class="info-card-sub">SSD recommandé</div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-label">Réseau</div>
+            <div class="info-card-value">Port 80 ouvert</div>
+            <div class="info-card-sub">Accès internet pour l'install</div>
+          </div>
+        </div>
+
+        <h2>Vérification depuis le terminal</h2>
+        <p>Lancez ces commandes pour vous assurer que le serveur remplit les prérequis :</p>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang">bash</span>
+            <button class="code-copy" onclick="copyCode(this)">Copier</button>
+          </div>
+<pre><span class="comment"># Vérifier la distribution</span>
+lsb_release -a
+
+<span class="comment"># Mémoire disponible (minimum 4 Go recommandés)</span>
+free -h
+
+<span class="comment"># Espace disque disponible (minimum 20 Go recommandés)</span>
+df -h /
+
+<span class="comment"># Vérifier si Docker est déjà installé</span>
+docker --version && docker compose version</pre>
+        </div>
+
+        <div class="doc-nav">
+          <a class="doc-nav-link" onclick="showPage('introduction')">
+            <span class="doc-nav-dir">← Précédent</span>
+            <span class="doc-nav-title">Introduction</span>
+          </a>
+          <a class="doc-nav-link next" onclick="showPage('installation')">
+            <span class="doc-nav-dir">Suivant →</span>
+            <span class="doc-nav-title">Installation</span>
+          </a>
+        </div>
+      </article>
+
+      <!-- INSTALLATION -->
+      <article class="doc-page" id="page-installation">
+        <div class="page-header">
+          <div class="page-eyebrow">Démarrage</div>
+          <h1 class="page-title">Installation</h1>
+          <p class="page-desc">Procédure complète d'installation sur un serveur Debian/Ubuntu vierge. Durée estimée : 10 à 15 minutes.</p>
+        </div>
+
+        <div class="callout warning">
+          <span class="callout-icon">⚠</span>
+          <div class="callout-body">
+            <strong>Accès root requis</strong>
+            L'installation nécessite des droits <code>sudo</code>. Assurez-vous d'être connecté avec un compte disposant des privilèges d'administration.
+          </div>
+        </div>
+
+        <div class="steps">
+
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <div class="step-title">Vérifier les prérequis système</div>
+              <div class="step-desc">Avant tout, confirmez que le serveur remplit les conditions minimales (distribution, RAM, espace disque).</div>
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-lang">bash</span>
+                  <button class="code-copy" onclick="copyCode(this)">Copier</button>
+                </div>
+<pre>lsb_release -a
+free -h
+df -h /</pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <div class="step-title">Installer Docker Engine</div>
+              <div class="step-desc">Si Docker n'est pas présent sur le serveur, installez-le via le script officiel. Si Docker est déjà installé, passez à l'étape 3.</div>
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-lang">bash</span>
+                  <button class="code-copy" onclick="copyCode(this)">Copier</button>
+                </div>
+<pre><span class="comment"># Installation de Docker Engine (script officiel)</span>
+curl -fsSL https://get.docker.com | sudo sh
+
+<span class="comment"># Optionnel : ajouter l'utilisateur courant au groupe docker</span>
+<span class="comment"># (évite de taper sudo à chaque commande docker)</span>
+sudo usermod -aG docker $USER
+newgrp docker
+
+<span class="comment"># Vérifier l'installation</span>
+docker --version && docker compose version</pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <div class="step-title">Ajouter le dépôt Orion</div>
+              <div class="step-desc">Enregistrez le dépôt APT d'Orion, puis installez le paquet.</div>
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-lang">bash</span>
+                  <button class="code-copy" onclick="copyCode(this)">Copier</button>
+                </div>
+<pre><span class="comment"># Ajouter le dépôt</span>
+echo "deb [trusted=yes] https://orion.duckinc.soleilhac.me/packages/ ./" \
+  | sudo tee /etc/apt/sources.list.d/orion.list
+
+<span class="comment"># Installer le paquet</span>
+sudo apt update && sudo apt install orion</pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-body">
+              <div class="step-title">Vérifier la configuration et déployer</div>
+              <div class="step-desc"><code>orion-control check</code> valide l'environnement avant de lancer la stack. Ensuite, <code>orion-control deploy</code> génère le mot de passe PostgreSQL et démarre les quatre conteneurs.</div>
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-lang">bash</span>
+                  <button class="code-copy" onclick="copyCode(this)">Copier</button>
+                </div>
+<pre><span class="comment"># Valider l'environnement</span>
+orion-control check
+
+<span class="comment"># Déployer la stack</span>
+orion-control deploy</pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">5</div>
+            <div class="step-body">
+              <div class="step-title">Vérifier le bon fonctionnement</div>
+              <div class="step-desc">Attendez quelques secondes que PostgreSQL termine son initialisation, puis vérifiez l'état des conteneurs et l'API.</div>
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-lang">bash</span>
+                  <button class="code-copy" onclick="copyCode(this)">Copier</button>
+                </div>
+<pre><span class="comment"># État des conteneurs (orion_db doit être 'healthy')</span>
+orion-control status
+
+<span class="comment"># Tester le health check de l'API</span>
+curl http://localhost:3000/health
+<span class="comment"># Résultat attendu : {"status":"healthy","database":"connected",...}</span>
+
+<span class="comment"># Accéder à l'interface web</span>
+<span class="comment"># Ouvrir http://&lt;IP_DU_SERVEUR&gt;/ dans un navigateur</span></pre>
+              </div>
+
+              <div class="callout success">
+                <span class="callout-icon">✓</span>
+                <div class="callout-body">
+                  <strong>Installation réussie</strong>
+                  Si les quatre conteneurs sont <em>Up</em> et que l'API retourne <code>{"status":"healthy"}</code>, Orion est opérationnel.
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="doc-nav">
+          <a class="doc-nav-link" onclick="showPage('prerequisites')">
+            <span class="doc-nav-dir">← Précédent</span>
+            <span class="doc-nav-title">Prérequis</span>
+          </a>
+          <a class="doc-nav-link next" onclick="showPage('orion-control')">
+            <span class="doc-nav-dir">Suivant →</span>
+            <span class="doc-nav-title">orion-control</span>
+          </a>
+        </div>
+      </article>
+
+      <!-- ORION-CONTROL -->
+      <article class="doc-page" id="page-orion-control">
+        <div class="page-header">
+          <div class="page-eyebrow">Administration</div>
+          <h1 class="page-title">orion-control</h1>
+          <p class="page-desc">L'outil en ligne de commande pour piloter l'ensemble du cycle de vie de la stack Orion.</p>
+        </div>
+
+        <h2>Référence des commandes</h2>
+
+        <table class="doc-table">
+          <thead>
+            <tr><th>Commande</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>orion-control status</td>
+              <td>Affiche l'état de chaque conteneur (Up, healthy, exited…)</td>
+            </tr>
+            <tr>
+              <td>orion-control deploy</td>
+              <td>Démarre la stack (génère le mot de passe si premier lancement)</td>
+            </tr>
+            <tr>
+              <td>orion-control check</td>
+              <td>Valide l'environnement avant déploiement</td>
+            </tr>
+            <tr>
+              <td>orion-control update</td>
+              <td>Met à jour les images Docker et redémarre les conteneurs</td>
+            </tr>
+            <tr>
+              <td>orion-control logs [service]</td>
+              <td>Affiche les logs d'un ou tous les conteneurs</td>
+            </tr>
+            <tr>
+              <td>orion-control clear</td>
+              <td>Arrête les conteneurs et supprime les volumes <span class="badge red">Destructif</span></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout danger">
+          <span class="callout-icon">✕</span>
+          <div class="callout-body">
+            <strong>orion-control clear</strong>
+            Cette commande supprime tous les volumes Docker, incluant la base de données PostgreSQL. Elle entraîne une perte de données irréversible si aucune sauvegarde n'a été effectuée.
+          </div>
+        </div>
+
+        <h2>Exemples d'utilisation</h2>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang">bash</span>
+            <button class="code-copy" onclick="copyCode(this)">Copier</button>
+          </div>
+<pre><span class="comment"># Voir l'état de tous les conteneurs</span>
+orion-control status
+
+<span class="comment"># Suivre les logs de l'API en temps réel</span>
+orion-control logs api
+
+<span class="comment"># Suivre les logs de tous les services</span>
+orion-control logs
+
+<span class="comment"># Relancer la stack après une mise à jour du paquet</span>
+orion-control update</pre>
+        </div>
+
+        <div class="doc-nav">
+          <a class="doc-nav-link" onclick="showPage('installation')">
+            <span class="doc-nav-dir">← Précédent</span>
+            <span class="doc-nav-title">Installation</span>
+          </a>
+          <a class="doc-nav-link next" onclick="showPage('configuration')">
+            <span class="doc-nav-dir">Suivant →</span>
+            <span class="doc-nav-title">Configuration</span>
+          </a>
+        </div>
+      </article>
+
+      <!-- CONFIGURATION -->
+      <article class="doc-page" id="page-configuration">
+        <div class="page-header">
+          <div class="page-eyebrow">Administration</div>
+          <h1 class="page-title">Configuration</h1>
+          <p class="page-desc">Les paramètres de la stack Orion sont centralisés dans un seul fichier d'environnement.</p>
+        </div>
+
+        <h2>Fichier de configuration</h2>
+        <p>Le fichier de configuration principal est <code>/etc/orion/.env</code>. Il est généré automatiquement lors du premier <code>orion-control deploy</code>.</p>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang">env</span>
+            <button class="code-copy" onclick="copyCode(this)">Copier</button>
+          </div>
+<pre><span class="comment"># /etc/orion/.env</span>
+
+<span class="comment"># Identifiants PostgreSQL (générés automatiquement)</span>
+POSTGRES_USER=orion_admin
+POSTGRES_PASSWORD=<span class="string">xxxxxxxxxxxxxxxx</span>
+POSTGRES_DB=orion_db
+
+<span class="comment"># Port d'écoute de l'interface web</span>
+ORION_WEB_PORT=80
+
+<span class="comment"># Niveau de log de l'API (debug | info | warn | error)</span>
+LOG_LEVEL=info</pre>
+        </div>
+
+        <div class="callout warning">
+          <span class="callout-icon">⚠</span>
+          <div class="callout-body">
+            <strong>Modifications du mot de passe</strong>
+            Si vous modifiez <code>POSTGRES_PASSWORD</code> après le premier déploiement, vous devez aussi mettre à jour le mot de passe directement dans PostgreSQL via <code>docker exec</code>, sinon l'API ne pourra plus se connecter.
+          </div>
+        </div>
+
+        <h2>Appliquer les modifications</h2>
+        <p>Tout changement dans <code>/etc/orion/.env</code> nécessite un redémarrage de la stack pour être pris en compte :</p>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang">bash</span>
+            <button class="code-copy" onclick="copyCode(this)">Copier</button>
+          </div>
+<pre>sudo nano /etc/orion/.env
+
+<span class="comment"># Redémarrer après modification</span>
+orion-control deploy</pre>
+        </div>
+
+        <div class="doc-nav">
+          <a class="doc-nav-link" onclick="showPage('orion-control')">
+            <span class="doc-nav-dir">← Précédent</span>
+            <span class="doc-nav-title">orion-control</span>
+          </a>
+          <a class="doc-nav-link next" onclick="showPage('maintenance')">
+            <span class="doc-nav-dir">Suivant →</span>
+            <span class="doc-nav-title">Maintenance & mises à jour</span>
+          </a>
+        </div>
+      </article>
+
+      <!-- MAINTENANCE -->
+      <article class="doc-page" id="page-maintenance">
+        <div class="page-header">
+          <div class="page-eyebrow">Administration</div>
+          <h1 class="page-title">Maintenance & mises à jour</h1>
+          <p class="page-desc">Procédures à suivre pour la vérification de santé quotidienne et les mises à jour d'Orion.</p>
+        </div>
+
+        <h2>Vérification de santé quotidienne</h2>
+        <p>Ces vérifications peuvent être intégrées dans un cron ou exécutées lors des rondes d'administration :</p>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang">bash</span>
+            <button class="code-copy" onclick="copyCode(this)">Copier</button>
+          </div>
+<pre>#!/bin/bash
+<span class="comment"># Script de vérification santé Orion</span>
+
+echo "=== État des conteneurs ==="
+orion-control status
+
+echo ""
+echo "=== Health check API ==="
+HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/health)
+if [ "$HTTP_CODE" = "200" ]; then
+    echo "✓ API opérationnelle (HTTP 200)"
+else
+    echo "✗ API indisponible (HTTP $HTTP_CODE)"
+fi
+
+echo ""
+echo "=== Taille de la base de données ==="
+docker exec orion_db psql -U orion_admin -d orion_db -c \
+    "SELECT pg_size_pretty(pg_database_size('orion_db')) AS taille;"
+
+echo ""
+echo "=== Logs d'erreur récents (API) ==="
+docker logs --tail=20 orion_api 2>&1 | grep -i error || echo "Aucune erreur récente"</pre>
+        </div>
+
+        <h2>Procédure de mise à jour</h2>
+        <p>Les mises à jour suivent un processus en deux temps : mise à jour du paquet Debian, puis mise à jour des images Docker. La base de données n'est pas affectée car les données persistent dans un volume Docker.</p>
+
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <div class="step-title">Mettre à jour le paquet Debian</div>
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-lang">bash</span>
+                  <button class="code-copy" onclick="copyCode(this)">Copier</button>
+                </div>
+<pre>sudo apt update && sudo apt upgrade orion
+
+<span class="comment"># Vérifier la nouvelle version installée</span>
+dpkg -l orion</pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <div class="step-title">Mettre à jour les images Docker et redémarrer</div>
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-lang">bash</span>
+                  <button class="code-copy" onclick="copyCode(this)">Copier</button>
+                </div>
+<pre>orion-control update</pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <div class="step-title">Vérifier le bon fonctionnement</div>
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-lang">bash</span>
+                  <button class="code-copy" onclick="copyCode(this)">Copier</button>
+                </div>
+<pre>orion-control status
+curl http://localhost:3000/health</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout info">
+          <span class="callout-icon">ℹ</span>
+          <div class="callout-body">
+            <strong>Migrations de schéma</strong>
+            Si une mise à jour majeure inclut des modifications de schéma de base de données, des étapes supplémentaires seront documentées dans les notes de version associées.
+          </div>
+        </div>
+
+        <div class="doc-nav">
+          <a class="doc-nav-link" onclick="showPage('configuration')">
+            <span class="doc-nav-dir">← Précédent</span>
+            <span class="doc-nav-title">Configuration</span>
+          </a>
+          <a class="doc-nav-link next" onclick="showPage('backup')">
+            <span class="doc-nav-dir">Suivant →</span>
+            <span class="doc-nav-title">Sauvegarde & restauration</span>
+          </a>
+        </div>
+      </article>
+
+      <!-- BACKUP -->
+      <article class="doc-page" id="page-backup">
+        <div class="page-header">
+          <div class="page-eyebrow">Opérations</div>
+          <h1 class="page-title">Sauvegarde & restauration</h1>
+          <p class="page-desc">Orion ne dispose pas de mécanisme de sauvegarde automatique intégré. La sauvegarde PostgreSQL est de la responsabilité de l'administrateur système.</p>
+        </div>
+
+        <div class="callout warning">
+          <span class="callout-icon">⚠</span>
+          <div class="callout-body">
+            <strong>Obligation opérationnelle</strong>
+            La sauvegarde régulière est indispensable. Elle doit être intégrée dans votre infrastructure existante (cron + rsync, Veeam, Bacula, etc.).
+          </div>
+        </div>
+
+        <h2>Sauvegarde avec pg_dump</h2>
+        <p>La méthode recommandée utilise <code>pg_dump</code> exécuté via <code>docker exec</code>. Elle produit un dump cohérent grâce aux verrous PostgreSQL posés pendant l'opération.</p>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang">bash</span>
+            <button class="code-copy" onclick="copyCode(this)">Copier</button>
+          </div>
+<pre><span class="comment"># Sauvegarde format SQL texte</span>
+docker exec orion_db pg_dump -U orion_admin orion_db > \
+    /backup/orion_$(date +%Y%m%d_%H%M%S).sql
+
+<span class="comment"># Sauvegarde compressée (recommandé pour les grandes bases)</span>
+docker exec orion_db pg_dump -U orion_admin --format=custom orion_db > \
+    /backup/orion_$(date +%Y%m%d_%H%M%S).pgdump</pre>
+        </div>
+
+        <h2>Planification automatique (cron)</h2>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang">bash</span>
+            <button class="code-copy" onclick="copyCode(this)">Copier</button>
+          </div>
+<pre><span class="comment"># Sauvegarde quotidienne à 2h00 du matin</span>
+<span class="comment"># Ajouter dans crontab via : crontab -e</span>
+0 2 * * * docker exec orion_db pg_dump -U orion_admin --format=custom orion_db > /backup/orion_$(date +\%Y\%m\%d).pgdump</pre>
+        </div>
+
+        <h2>Restauration</h2>
+        <p>Arrêtez l'API et le module CLT avant la restauration pour éviter des écritures concurrentes.</p>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang">bash</span>
+            <button class="code-copy" onclick="copyCode(this)">Copier</button>
+          </div>
+<pre><span class="comment"># 1. Arrêter les services qui accèdent à la base</span>
+docker stop orion_api orion_clt
+
+<span class="comment"># 2a. Restauration depuis un dump SQL texte</span>
+cat /backup/orion_20260413_020000.sql | \
+    docker exec -i orion_db psql -U orion_admin -d orion_db
+
+<span class="comment"># 2b. Restauration depuis un dump custom (plus rapide)</span>
+docker exec -i orion_db pg_restore -U orion_admin -d orion_db --clean < \
+    /backup/orion_20260413_020000.pgdump
+
+<span class="comment"># 3. Redémarrer les services</span>
+orion-control deploy</pre>
+        </div>
+
+        <div class="doc-nav">
+          <a class="doc-nav-link" onclick="showPage('maintenance')">
+            <span class="doc-nav-dir">← Précédent</span>
+            <span class="doc-nav-title">Maintenance & mises à jour</span>
+          </a>
+          <a class="doc-nav-link next" onclick="showPage('monitoring')">
+            <span class="doc-nav-dir">Suivant →</span>
+            <span class="doc-nav-title">Monitoring & logs</span>
+          </a>
+        </div>
+      </article>
+
+      <!-- MONITORING -->
+      <article class="doc-page" id="page-monitoring">
+        <div class="page-header">
+          <div class="page-eyebrow">Opérations</div>
+          <h1 class="page-title">Monitoring & logs</h1>
+          <p class="page-desc">Accès aux logs des conteneurs et configuration de la rotation pour éviter une saturation du disque.</p>
+        </div>
+
+        <h2>Accéder aux logs</h2>
+        <p>Chaque conteneur expose ses logs sur stdout/stderr. <code>orion-control logs</code> est un raccourci vers <code>docker compose logs</code>.</p>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang">bash</span>
+            <button class="code-copy" onclick="copyCode(this)">Copier</button>
+          </div>
+<pre><span class="comment"># Logs de tous les services (50 dernières lignes)</span>
+orion-control logs
+
+<span class="comment"># Logs d'un service spécifique, en direct</span>
+orion-control logs api
+orion-control logs web
+orion-control logs db
+
+<span class="comment"># Accès direct via docker (avec filtres)</span>
+docker logs --tail=100 orion_api
+docker logs --since 1h orion_api 2>&1 | grep -i error</pre>
+        </div>
+
+        <h2>Configurer la rotation des logs</h2>
+        <p>Sans configuration, Docker stocke les logs sans limite dans des fichiers JSON sur l'hôte. Il est fortement recommandé de limiter leur taille.</p>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang">json</span>
+            <button class="code-copy" onclick="copyCode(this)">Copier</button>
+          </div>
+<pre><span class="comment">// /etc/docker/daemon.json</span>
+{
+  <span class="string">"log-driver"</span>: <span class="string">"json-file"</span>,
+  <span class="string">"log-opts"</span>: {
+    <span class="string">"max-size"</span>: <span class="string">"10m"</span>,
+    <span class="string">"max-file"</span>: <span class="string">"5"</span>
+  }
+}</pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang">bash</span>
+            <button class="code-copy" onclick="copyCode(this)">Copier</button>
+          </div>
+<pre><span class="comment"># Redémarrer Docker pour appliquer la configuration</span>
+sudo systemctl restart docker</pre>
+        </div>
+
+        <div class="callout info">
+          <span class="callout-icon">ℹ</span>
+          <div class="callout-body">
+            <strong>Capacité estimée</strong>
+            Avec cette configuration, chaque conteneur est limité à 5 fichiers de 10 Mo, soit 50 Mo par conteneur et environ 200 Mo pour l'ensemble de la stack.
+          </div>
+        </div>
+
+        <h2>Surveiller la taille de la base</h2>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang">sql</span>
+            <button class="code-copy" onclick="copyCode(this)">Copier</button>
+          </div>
+<pre><span class="comment">-- Tables les plus volumineuses</span>
+SELECT
+    tablename,
+    pg_size_pretty(pg_total_relation_size('public.'||tablename)) AS taille_totale
+FROM pg_tables
+WHERE schemaname = 'public'
+ORDER BY pg_total_relation_size('public.'||tablename) DESC
+LIMIT 10;
+
+<span class="comment">-- Purger les métriques de plus de 90 jours</span>
+DELETE FROM device_metrics_history
+WHERE time < NOW() - INTERVAL '90 days';
+
+<span class="comment">-- Récupérer l'espace disque après purge</span>
+VACUUM ANALYZE device_metrics_history;</pre>
+        </div>
+
+        <div class="doc-nav">
+          <a class="doc-nav-link" onclick="showPage('backup')">
+            <span class="doc-nav-dir">← Précédent</span>
+            <span class="doc-nav-title">Sauvegarde & restauration</span>
+          </a>
+          <a class="doc-nav-link next" onclick="showPage('troubleshooting')">
+            <span class="doc-nav-dir">Suivant →</span>
+            <span class="doc-nav-title">Résolution de problèmes</span>
+          </a>
+        </div>
+      </article>
+
+      <!-- TROUBLESHOOTING -->
+      <article class="doc-page" id="page-troubleshooting">
+        <div class="page-header">
+          <div class="page-eyebrow">Diagnostic</div>
+          <h1 class="page-title">Résolution de problèmes</h1>
+          <p class="page-desc">Les problèmes les plus fréquemment rencontrés et leurs solutions.</p>
+        </div>
+
+        <h2>L'API ne démarre pas — erreur de connexion à PostgreSQL</h2>
+
+        <div class="callout danger">
+          <span class="callout-icon">✕</span>
+          <div class="callout-body">
+            <strong>Symptôme</strong>
+            Le conteneur <code>orion_api</code> redémarre en boucle. Les logs affichent des messages du type <code>Tentative X/30 → ECONNREFUSED</code> ou <code>ETIMEDOUT</code>.
+          </div>
+        </div>
+
+        <h3>Causes et solutions</h3>
+        <p><strong style="color:var(--text)">PostgreSQL n'a pas terminé son initialisation</strong></p>
+        <p>Attendre quelques secondes et vérifier avec <code>orion-control status</code>. Si <code>orion_db</code> n'est pas encore <em>healthy</em>, c'est normal.</p>
+
+        <p><strong style="color:var(--text)">Mot de passe incorrect dans <code>/etc/orion/.env</code></strong></p>
+        <p>Vérifier que le mot de passe correspond à celui de la base :</p>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang">bash</span>
+            <button class="code-copy" onclick="copyCode(this)">Copier</button>
+          </div>
+<pre>docker exec orion_db psql -U orion_admin -c '\l'</pre>
+        </div>
+
+        <p><strong style="color:var(--text)">Volume <code>postgres_data</code> corrompu</strong></p>
+        <p>Vérifier les logs de <code>orion_db</code>. En dernier recours, réinitialiser (perte de données si pas de sauvegarde) :</p>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang">bash</span>
+            <button class="code-copy" onclick="copyCode(this)">Copier</button>
+          </div>
+<pre><span class="comment"># ⚠ PERTE DE DONNÉES si aucune sauvegarde disponible</span>
+orion-control clear
+orion-control deploy</pre>
+        </div>
+
+        <hr>
+
+        <h2>Erreur 502 Bad Gateway sur le site web</h2>
+
+        <div class="callout danger">
+          <span class="callout-icon">✕</span>
+          <div class="callout-body">
+            <strong>Symptôme</strong>
+            Le site web est accessible mais toutes les requêtes vers <code>/api/</code> retournent une erreur 502.
+          </div>
+        </div>
+
+        <p>Le conteneur <code>orion_web</code> ne peut pas joindre <code>orion_api</code>. Vérifier que l'API est démarrée et healthy :</p>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang">bash</span>
+            <button class="code-copy" onclick="copyCode(this)">Copier</button>
+          </div>
+<pre>orion-control status
+
+<span class="comment"># Si l'API est arrêtée, la relancer</span>
+docker start orion_api
+
+<span class="comment"># Si elle redémarre en boucle, consulter les logs</span>
+orion-control logs api</pre>
+        </div>
+
+        <hr>
+
+        <h2>La base de données grossit trop vite</h2>
+
+        <div class="callout warning">
+          <span class="callout-icon">⚠</span>
+          <div class="callout-body">
+            <strong>Symptôme</strong>
+            L'espace disque se remplit progressivement, principalement occupé par le volume Docker <code>postgres_data</code>.
+          </div>
+        </div>
+
+        <p>Identifier les tables volumineuses puis appliquer une politique de rétention :</p>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang">sql</span>
+            <button class="code-copy" onclick="copyCode(this)">Copier</button>
+          </div>
+<pre><span class="comment">-- Identifier les tables les plus volumineuses</span>
+SELECT
+    tablename,
+    pg_size_pretty(pg_total_relation_size('public.'||tablename)) AS taille_totale
+FROM pg_tables
+WHERE schemaname = 'public'
+ORDER BY pg_total_relation_size('public.'||tablename) DESC
+LIMIT 10;
+
+<span class="comment">-- Purger les métriques de plus de 90 jours</span>
+DELETE FROM device_metrics_history
+WHERE time < NOW() - INTERVAL '90 days';
+
+<span class="comment">-- Récupérer l'espace disque après purge</span>
+VACUUM ANALYZE device_metrics_history;</pre>
+        </div>
+
+        <div class="doc-nav">
+          <a class="doc-nav-link" onclick="showPage('monitoring')">
+            <span class="doc-nav-dir">← Précédent</span>
+            <span class="doc-nav-title">Monitoring & logs</span>
+          </a>
+          <div></div>
+        </div>
+      </article>
+
+    </main>
+  </div>
+
+  <script>
+    // ─── NAVIGATION ───
+    const pages = {
+      'introduction': 'Introduction',
+      'prerequisites': 'Prérequis',
+      'installation': 'Installation',
+      'orion-control': 'orion-control',
+      'configuration': 'Configuration',
+      'maintenance': 'Maintenance & mises à jour',
+      'backup': 'Sauvegarde & restauration',
+      'monitoring': 'Monitoring & logs',
+      'troubleshooting': 'Résolution de problèmes'
+    };
+
+    function showPage(id) {
+      document.querySelectorAll('.doc-page').forEach(p => p.classList.remove('visible'));
+      document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+
+      const page = document.getElementById('page-' + id);
+      if (page) page.classList.add('visible');
+
+      document.querySelectorAll('.sidebar-link').forEach(l => {
+        if (l.getAttribute('onclick') && l.getAttribute('onclick').includes("'" + id + "'")) {
+          l.classList.add('active');
+        }
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Close sidebar on mobile
+      if (window.innerWidth <= 900) {
+        document.getElementById('sidebar').classList.remove('open');
+      }
+    }
+
+    // ─── HAMBURGER ───
+    document.getElementById('hamburgerBtn').addEventListener('click', () => {
+      document.getElementById('sidebar').classList.toggle('open');
+    });
+
+    // ─── COPY CODE ───
+    function copyCode(btn) {
+      const pre = btn.closest('.code-block').querySelector('pre');
+      const text = pre.innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = 'Copié !';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = 'Copier';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    }
+
+    // ─── STARS ───
+    const canvas = document.getElementById('stars');
+    const ctx = canvas.getContext('2d');
+    let w, h, stars = [];
+    const STAR_COUNT = 80;
+
+    function resize() {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    for (let i = 0; i < STAR_COUNT; i++) {
+      stars.push({ x: Math.random() * w, y: Math.random() * h, vx: 0, vy: 0 });
+    }
+
+    let mouse = { x: null, y: null };
+    window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+
+    function draw() {
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      stars.forEach(s => {
+        if (mouse.x !== null) {
+          const dx = s.x - mouse.x, dy = s.y - mouse.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 150) { s.vx += dx / dist * 0.04; s.vy += dy / dist * 0.04; }
+        }
+        s.x += s.vx; s.y += s.vy;
+        s.vx *= 0.95; s.vy *= 0.95;
+        if (s.x < 0) s.x = w; if (s.x > w) s.x = 0;
+        if (s.y < 0) s.y = h; if (s.y > h) s.y = 0;
+        ctx.beginPath(); ctx.arc(s.x, s.y, 1.2, 0, Math.PI * 2); ctx.fill();
+      });
+      for (let i = 0; i < stars.length; i++) {
+        for (let j = i + 1; j < stars.length; j++) {
+          const dx = stars[i].x - stars[j].x, dy = stars[i].y - stars[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 100) {
+            ctx.strokeStyle = `rgba(99,102,241,${0.12 * (1 - dist/100)})`;
+            ctx.beginPath(); ctx.moveTo(stars[i].x, stars[i].y);
+            ctx.lineTo(stars[j].x, stars[j].y); ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(draw);
+    }
+    draw();
+  </script>
+
+</body>
+</html>

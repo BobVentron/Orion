@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Orion – Roadmap</title>
+  <link rel="icon" href="assets/icon.svg" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #020617;
+      --primary: #6366f1;
+      --secondary: #a855f7;
+      --teal: #14b8a6;
+      --amber: #f59e0b;
+      --rose: #f43f5e;
+      --border: rgba(255,255,255,0.08);
+      --border-hover: rgba(99,102,241,0.4);
+      --glass: rgba(255,255,255,0.03);
+      --glass2: rgba(255,255,255,0.06);
+      --text: #f1f5f9;
+      --muted: #64748b;
+      --muted2: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(99,102,241,0.1) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0; z-index: 100;
+      padding: 0 5%; height: 68px;
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(2,6,23,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); }
+    .nav-logo img { width: 28px; height: 28px; }
+    .nav-logo span { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; letter-spacing: -0.5px; }
+    .nav-links { display: flex; align-items: center; gap: 8px; list-style: none; }
+    .nav-links a { text-decoration: none; color: var(--muted2); font-size: 0.875rem; font-weight: 500; padding: 6px 14px; border-radius: 8px; transition: all 0.2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); background: var(--glass2); }
+    .nav-links a.active { color: var(--primary); }
+    .nav-cta { background: linear-gradient(135deg, var(--primary), var(--secondary)) !important; color: white !important; padding: 7px 18px !important; border-radius: 10px !important; }
+
+    .page { position: relative; z-index: 1; padding-top: 68px; }
+
+    .hero { text-align: center; padding: 90px 5% 70px; }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(99,102,241,0.12);
+      border: 1px solid rgba(99,102,241,0.3);
+      color: #a5b4fc;
+      font-size: 0.8rem; font-weight: 500; padding: 5px 14px; border-radius: 100px;
+      margin-bottom: 28px; letter-spacing: 0.5px; text-transform: uppercase;
+    }
+    .badge::before { content: '◆'; font-size: 0.6rem; }
+
+    h1 { font-family: 'Syne', sans-serif; font-size: clamp(2.4rem, 5vw, 3.8rem); font-weight: 800; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 20px; }
+    h1 span { background: linear-gradient(135deg, #a5b4fc, #f9a8d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+    .hero p { color: var(--muted2); font-size: 1.05rem; max-width: 520px; margin: 0 auto; line-height: 1.7; }
+
+    /* VERSION BADGE */
+    .version-bar {
+      display: flex; justify-content: center; gap: 12px;
+      margin: 30px 0 0; flex-wrap: wrap;
+    }
+
+    .ver-chip {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--glass2); border: 1px solid var(--border);
+      border-radius: 100px; padding: 6px 14px;
+      font-size: 0.82rem;
+    }
+
+    .ver-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .dot-done { background: var(--teal); box-shadow: 0 0 6px var(--teal); }
+    .dot-wip  { background: var(--amber); box-shadow: 0 0 6px var(--amber); animation: pulse 2s infinite; }
+    .dot-todo { background: var(--muted); }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* KANBAN */
+    .kanban {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      max-width: 1100px;
+      margin: 60px auto;
+      padding: 0 5%;
+    }
+
+    .kanban-col {
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+    }
+
+    .col-header {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .col-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .col-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; }
+    .col-count {
+      margin-left: auto;
+      background: var(--glass2);
+      border: 1px solid var(--border);
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      border-radius: 100px;
+      color: var(--muted2);
+    }
+
+    .kanban-card {
+      background: var(--glass2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      transition: border-color 0.2s, transform 0.2s;
+      cursor: default;
+    }
+
+    .kanban-card:hover { border-color: var(--border-hover); transform: translateY(-1px); }
+    .kanban-card:last-child { margin-bottom: 0; }
+
+    .card-label {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 0.68rem; font-weight: 600; padding: 2px 8px;
+      border-radius: 6px; margin-bottom: 8px; letter-spacing: 0.3px;
+    }
+
+    .label-infra   { background: rgba(99,102,241,0.15); color: #a5b4fc; }
+    .label-collect { background: rgba(20,184,166,0.12); color: #5eead4; }
+    .label-ui      { background: rgba(168,85,247,0.12); color: #d8b4fe; }
+    .label-auth    { background: rgba(245,158,11,0.12); color: #fcd34d; }
+    .label-api     { background: rgba(14,165,233,0.12); color: #7dd3fc; }
+    .label-sec     { background: rgba(244,63,94,0.12); color: #fda4af; }
+
+    .card-title { font-size: 0.875rem; font-weight: 500; color: var(--text); line-height: 1.4; }
+    .card-desc { font-size: 0.78rem; color: var(--muted2); margin-top: 4px; line-height: 1.4; }
+
+    .card-version {
+      display: inline-block;
+      font-size: 0.68rem; color: var(--muted); margin-top: 8px;
+      background: var(--glass);
+      border: 1px solid var(--border);
+      padding: 2px 8px; border-radius: 6px;
+    }
+
+    /* TIMELINE */
+    .timeline-section {
+      max-width: 700px;
+      margin: 0 auto 80px;
+      padding: 0 5%;
+    }
+
+    .section-label {
+      font-family: 'Syne', sans-serif; font-size: 0.75rem; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase; color: var(--primary);
+      margin-bottom: 12px; text-align: center;
+    }
+
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(1.8rem, 3vw, 2.4rem);
+      font-weight: 800; letter-spacing: -1px;
+      text-align: center; margin-bottom: 50px;
+    }
+
+    .timeline {
+      position: relative;
+      padding-left: 32px;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 7px; top: 0; bottom: 0;
+      width: 1px;
+      background: linear-gradient(to bottom, var(--primary), rgba(99,102,241,0.1));
+    }
+
+    .tl-item {
+      position: relative;
+      margin-bottom: 36px;
+    }
+
+    .tl-dot {
+      position: absolute;
+      left: -32px; top: 4px;
+      width: 15px; height: 15px;
+      border-radius: 50%;
+      border: 2px solid var(--bg);
+      flex-shrink: 0;
+    }
+
+    .tl-dot.done  { background: var(--teal); box-shadow: 0 0 8px rgba(20,184,166,0.5); }
+    .tl-dot.wip   { background: var(--amber); box-shadow: 0 0 8px rgba(245,158,11,0.5); animation: pulse 2s infinite; }
+    .tl-dot.soon  { background: var(--primary); }
+    .tl-dot.later { background: var(--muted); }
+
+    .tl-version {
+      font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.85rem;
+      color: var(--primary); margin-bottom: 4px;
+    }
+
+    .tl-title {
+      font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.05rem;
+      margin-bottom: 6px;
+    }
+
+    .tl-desc {
+      font-size: 0.875rem; color: var(--muted2); line-height: 1.6;
+    }
+
+    .tl-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .tl-tag { font-size: 0.7rem; padding: 2px 8px; border-radius: 6px; background: var(--glass2); border: 1px solid var(--border); color: var(--muted2); }
+
+    /* CONTRIBUTE */
+    .contribute {
+      background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(168,85,247,0.06));
+      border: 1px solid rgba(99,102,241,0.2);
+      border-radius: 24px;
+      padding: 60px 40px;
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto 80px;
+    }
+
+    .contribute h2 { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 14px; }
+    .contribute p { color: var(--muted2); margin-bottom: 28px; font-size: 0.95rem; line-height: 1.6; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 13px 28px; border-radius: 12px;
+      font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 600;
+      cursor: pointer; transition: all 0.25s;
+      text-decoration: none;
+    }
+
+    .btn.primary { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border: none; }
+    .btn.outline { background: var(--glass2); border: 1px solid var(--border); color: var(--text); }
+    .btn:hover { transform: translateY(-2px); opacity: 0.9; }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 5%;
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;
+    }
+    .footer-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--muted2); font-size: 0.875rem; }
+    .footer-logo img { width: 20px; opacity: 0.6; }
+    .footer-links { display: flex; gap: 24px; list-style: none; }
+    .footer-links a { text-decoration: none; color: var(--muted); font-size: 0.8rem; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--muted2); }
+    .footer-copy { color: var(--muted); font-size: 0.8rem; }
+
+    @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    .hero { animation: fadeUp 0.6s ease both; }
+    .kanban-col:nth-child(1) { animation: fadeUp 0.5s 0.1s ease both; }
+    .kanban-col:nth-child(2) { animation: fadeUp 0.5s 0.2s ease both; }
+    .kanban-col:nth-child(3) { animation: fadeUp 0.5s 0.3s ease both; }
+
+    @media (max-width: 900px) {
+      .kanban { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <!-- DARK/LIGHT THEME TOGGLE -->
+  <button id="theme-toggle" onclick="toggleTheme()" title="Changer le thème">
+    <span id="theme-icon">☀️</span>
+  </button>
+  <style>
+    #theme-toggle {
+      position: fixed; top: 16px; right: 20px; z-index: 500;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 10px; width: 38px; height: 38px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 1rem; transition: all 0.2s;
+      backdrop-filter: blur(8px);
+    }
+    #theme-toggle:hover { background: rgba(255,255,255,0.12); transform: scale(1.08); }
+    body.light {
+      --bg: #f8fafc !important; --bg2: #f1f5f9 !important;
+      --text: #0f172a !important; --muted: #94a3b8 !important;
+      --muted2: #64748b !important; --border: rgba(0,0,0,0.09) !important;
+      --border-hover: rgba(99,102,241,0.4) !important;
+      --glass: rgba(0,0,0,0.025) !important; --glass2: rgba(0,0,0,0.05) !important;
+      background: #f8fafc !important; color: #0f172a !important;
+    }
+    body.light nav { background: rgba(248,250,252,0.92) !important; }
+    body.light footer { background: transparent; }
+    body.light #theme-toggle { background: rgba(0,0,0,0.06); border-color: rgba(0,0,0,0.1); }
+    body.light::before { opacity: 0.35 !important; }
+  </style>
+  <script>
+    (function(){
+      var saved = localStorage.getItem("orion-theme");
+      if (saved === "light") {
+        document.body.classList.add("light");
+        var el = document.getElementById("theme-icon");
+        if (el) el.textContent = "🌙";
+      }
+    })();
+    function toggleTheme() {
+      var isLight = document.body.classList.toggle("light");
+      document.getElementById("theme-icon").textContent = isLight ? "🌙" : "☀️";
+      localStorage.setItem("orion-theme", isLight ? "light" : "dark");
+    }
+  </script>
+
+
+  <nav>
+    <a class="nav-logo" href="index.html">
+      <img src="assets/icon.svg" alt="Orion" />
+      <span>Orion</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="features.html">Fonctionnalités</a></li>
+      <li><a href="pricing.html">Tarification</a></li>
+      <li><a href="roadmap.html" class="active">Roadmap</a></li>
+      <li><a href="comparatif.html">Comparatif</a></li>
+      <li><a href="about.html">À propos</a></li>
+      <li><a href="docs.html" class="nav-cta">Documentation →</a></li>
+    </ul>
+  </nav>
+
+  <div class="page">
+
+    <section class="hero">
+      <div class="badge">Roadmap publique</div>
+      <h1>Ce qu'on construit,<br><span>et ce qui vient</span></h1>
+      <p>Transparence totale sur l'avancement du projet. Version actuelle : <strong style="color:var(--text)">v0.2-9</strong> — fondation technique complète.</p>
+      <div class="version-bar">
+        <div class="ver-chip"><span class="ver-dot dot-done"></span>Terminé (v0.2-9)</div>
+        <div class="ver-chip"><span class="ver-dot dot-wip"></span>En cours (v0.3)</div>
+        <div class="ver-chip"><span class="ver-dot dot-todo"></span>Planifié</div>
+      </div>
+    </section>
+
+    <!-- KANBAN -->
+    <div class="kanban">
+
+      <!-- DONE -->
+      <div class="kanban-col">
+        <div class="col-header">
+          <div class="col-dot" style="background:var(--teal)"></div>
+          <div class="col-title">Terminé</div>
+          <div class="col-count">10</div>
+        </div>
+
+        <div class="kanban-card">
+          <div class="card-label label-infra">Infrastructure</div>
+          <div class="card-title">Stack Docker 4 conteneurs</div>
+          <div class="card-desc">CLT, API, WEB, DB orchestrés par Docker Compose avec healthchecks.</div>
+          <div class="card-version">v0.1</div>
+        </div>
+
+        <div class="kanban-card">
+          <div class="card-label label-infra">Infrastructure</div>
+          <div class="card-title">Paquet Debian + dépôt APT</div>
+          <div class="card-desc">Distribution via apt install orion depuis le dépôt OVH.</div>
+          <div class="card-version">v0.2</div>
+        </div>
+
+        <div class="kanban-card">
+          <div class="card-label label-infra">Infrastructure</div>
+          <div class="card-title">CLI orion-control</div>
+          <div class="card-desc">deploy, stop, logs, update, check, clear.</div>
+          <div class="card-version">v0.2</div>
+        </div>
+
+        <div class="kanban-card">
+          <div class="card-label label-infra">Infrastructure</div>
+          <div class="card-title">Infrastructure OVH sécurisée</div>
+          <div class="card-desc">pfSense, bastion SSH, NPM, dépôt web segmentés en VMs Proxmox.</div>
+          <div class="card-version">v0.2</div>
+        </div>
+
+        <div class="kanban-card">
+          <div class="card-label label-infra">Schéma DB</div>
+          <div class="card-title">PostgreSQL — 60+ tables</div>
+          <div class="card-desc">21 sections : inventaire, IPAM, RBAC, audit trail, métriques, firmwares...</div>
+          <div class="card-version">v0.2-9</div>
+        </div>
+
+        <div class="kanban-card">
+          <div class="card-label label-collect">Collecte</div>
+          <div class="card-title">Collecte SNMP v1/v2c/v3</div>
+          <div class="card-desc">12 collecteurs : system, interfaces, topology, vlans, ARP, routing, STP...</div>
+          <div class="card-version">v0.2-9</div>
+        </div>
+
+        <div class="kanban-card">
+          <div class="card-label label-collect">Collecte</div>
+          <div class="card-title">SSH via Netmiko</div>
+          <div class="card-desc">Sauvegarde config et admin à distance multi-constructeurs.</div>
+          <div class="card-version">v0.2-9</div>
+        </div>
+
+        <div class="kanban-card">
+          <div class="card-label label-api">API</div>
+          <div class="card-title">Endpoint /health et /sql</div>
+          <div class="card-desc">Health check et interface SQL générique avec gestion d'erreurs PG.</div>
+          <div class="card-version">v0.2-9</div>
+        </div>
+
+        <div class="kanban-card">
+          <div class="card-label label-sec">Sécurité</div>
+          <div class="card-title">Conteneurs non-root + secrets</div>
+          <div class="card-desc">Utilisateurs dédiés, mot de passe généré aléatoirement à l'install.</div>
+          <div class="card-version">v0.2-9</div>
+        </div>
+
+        <div class="kanban-card">
+          <div class="card-label label-infra">Seed data</div>
+          <div class="card-title">Données initiales + RBAC</div>
+          <div class="card-desc">Vendors, 36 permissions, 3 rôles système, utilisateurs initiaux.</div>
+          <div class="card-version">v0.2-9</div>
+        </div>
+      </div>
+
+      <!-- IN PROGRESS -->
+      <div class="kanban-col" style="border-color:rgba(245,158,11,0.2)">
+        <div class="col-header">
+          <div class="col-dot" style="background:var(--amber)"></div>
+          <div class="col-title">En cours — v0.3</div>
+          <div class="col-count">5</div>
+        </div>
+
+        <div class="kanban-card" style="border-color:rgba(245,158,11,0.2)">
+          <div class="card-label label-api">API</div>
+          <div class="card-title">Endpoints REST métier complets</div>
+          <div class="card-desc">CRUD pour devices, interfaces, VLAN, IP, métriques — toutes les ressources.</div>
+        </div>
+
+        <div class="kanban-card" style="border-color:rgba(245,158,11,0.2)">
+          <div class="card-label label-ui">Interface</div>
+          <div class="card-title">Cartographie interactive D3.js</div>
+          <div class="card-desc">Graphe force-directed avec pinning, zoom, export SVG, statuts temps réel.</div>
+        </div>
+
+        <div class="kanban-card" style="border-color:rgba(245,158,11,0.2)">
+          <div class="card-label label-ui">Interface</div>
+          <div class="card-title">Dashboard supervision</div>
+          <div class="card-desc">Vue d'ensemble du parc, alertes actives, métriques Chart.js 24h/7j.</div>
+        </div>
+
+        <div class="kanban-card" style="border-color:rgba(245,158,11,0.2)">
+          <div class="card-label label-auth">Auth</div>
+          <div class="card-title">Authentification JWT</div>
+          <div class="card-desc">Login/logout, sessions, refresh token, middleware de contrôle d'accès.</div>
+        </div>
+
+        <div class="kanban-card" style="border-color:rgba(245,158,11,0.2)">
+          <div class="card-label label-collect">Collecte</div>
+          <div class="card-title">Module ICMP monitoring</div>
+          <div class="card-desc">Ping continu 60s, historique RTT, alertes en cas d'indisponibilité.</div>
+        </div>
+      </div>
+
+      <!-- PLANNED -->
+      <div class="kanban-col">
+        <div class="col-header">
+          <div class="col-dot" style="background:var(--primary)"></div>
+          <div class="col-title">Planifié — v0.4+</div>
+          <div class="col-count">8</div>
+        </div>
+
+        <div class="kanban-card">
+          <div class="card-label label-auth">Auth</div>
+          <div class="card-title">Intégration LDAP / Active Directory</div>
+          <div class="card-desc">SSO entreprise, mapping groupes AD → rôles Orion.</div>
+        </div>
+
+        <div class="kanban-card">
+          <div class="card-label label-ui">Interface</div>
+          <div class="card-title">Module IPAM complet</div>
+          <div class="card-desc">Visualisation des sous-réseaux, disponibilité IP, gestion manuelle.</div>
+        </div>
+
+        <div class="kanban-card">
+          <div class="card-label label-collect">Collecte</div>
+          <div class="card-title">Alertes & notifications</div>
+          <div class="card-desc">Email, Slack webhook, SNMP trap — seuils configurables par équipement.</div>
+        </div>
+
+        <div class="kanban-card">
+          <div class="card-label label-ui">Interface</div>
+          <div class="card-title">Terminal SSH web</div>
+          <div class="card-desc">Accès CLI aux équipements directement depuis l'interface Orion.</div>
+        </div>
+
+        <div class="kanban-card">
+          <div class="card-label label-infra">DB</div>
+          <div class="card-title">Partitionnement TimescaleDB</div>
+          <div class="card-desc">Hypertables pour device_metrics_history, compression automatique.</div>
+        </div>
+
+        <div class="kanban-card">
+          <div class="card-label label-api">API</div>
+          <div class="card-title">Migration vers TypeScript</div>
+          <div class="card-desc">Typage statique progressif, autocomplétion, détection d'erreurs à la compile.</div>
+        </div>
+
+        <div class="kanban-card">
+          <div class="card-label label-collect">Collecte</div>
+          <div class="card-title">Support BGP / OSPF</div>
+          <div class="card-desc">Collecte des routes BGP, voisins OSPF, redistribution.</div>
+        </div>
+
+        <div class="kanban-card">
+          <div class="card-label label-infra">Infra</div>
+          <div class="card-title">Signature GPG des paquets</div>
+          <div class="card-desc">Dépôt APT signé — suppression de l'option trusted=yes.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TIMELINE -->
+    <section class="timeline-section">
+      <div class="section-label">Versions</div>
+      <h2 class="section-title">Historique & jalons</h2>
+
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-dot done"></div>
+          <div class="tl-version">v0.2-9 — Avril 2026</div>
+          <div class="tl-title">Fondation technique complète</div>
+          <div class="tl-desc">Infrastructure de distribution (OVH / Proxmox), stack Docker opérationnelle, schéma PostgreSQL exhaustif (60+ tables), CLI orion-control, paquet Debian fonctionnel, collecte SNMP/SSH de base.</div>
+          <div class="tl-tags">
+            <span class="tl-tag">Docker</span>
+            <span class="tl-tag">PostgreSQL</span>
+            <span class="tl-tag">SNMP</span>
+            <span class="tl-tag">APT</span>
+          </div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-dot wip"></div>
+          <div class="tl-version">v0.3 — En cours</div>
+          <div class="tl-title">Interface et API fonctionnelles</div>
+          <div class="tl-desc">Endpoints REST complets, cartographie D3.js interactive, dashboard de supervision, authentification JWT, module ICMP temps réel.</div>
+          <div class="tl-tags">
+            <span class="tl-tag">REST API</span>
+            <span class="tl-tag">D3.js</span>
+            <span class="tl-tag">JWT</span>
+          </div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-dot soon"></div>
+          <div class="tl-version">v0.4 — Planifié</div>
+          <div class="tl-title">IPAM, alertes et LDAP</div>
+          <div class="tl-desc">Module IPAM complet, système d'alertes multi-canaux, intégration Active Directory pour les entreprises multi-sites.</div>
+          <div class="tl-tags">
+            <span class="tl-tag">IPAM</span>
+            <span class="tl-tag">Alertes</span>
+            <span class="tl-tag">LDAP</span>
+          </div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-dot later"></div>
+          <div class="tl-version">v1.0 — Horizon 2027</div>
+          <div class="tl-title">Version stable et certifiable</div>
+          <div class="tl-desc">Couverture fonctionnelle complète, TimescaleDB, terminal SSH web, BGP/OSPF, signature GPG. Cible : environnements ISO 27001 et conformité DSI.</div>
+          <div class="tl-tags">
+            <span class="tl-tag">TimescaleDB</span>
+            <span class="tl-tag">BGP</span>
+            <span class="tl-tag">ISO 27001</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTRIBUTE -->
+    <div style="padding:0 5%">
+      <div class="contribute">
+        <h2>Vous avez une idée ?</h2>
+        <p>La roadmap est publique et ouverte aux suggestions. Si une fonctionnalité vous manque ou si vous voulez contribuer, l'équipe DuckInc est à l'écoute.</p>
+        <a class="btn primary" href="mailto:contact@duckinc.fr">Suggérer une fonctionnalité</a>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    <a class="footer-logo" href="index.html">
+      <img src="assets/icon.svg" alt="Orion" />
+      Orion — DuckInc
+    </a>
+    <ul class="footer-links">
+      <li><a href="features.html">Fonctionnalités</a></li>
+      <li><a href="pricing.html">Tarification</a></li>
+      <li><a href="docs.html">Docs</a></li>
+      <li><a href="legal.html">Mentions légales</a></li>
+    </ul>
+    <span class="footer-copy">© 2026 DuckInc — Équipe Orion</span>
+  </footer>
+
+</body>
+</html>

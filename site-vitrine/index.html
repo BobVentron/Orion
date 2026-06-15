@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Orion – Cartographie & Supervision Réseau</title>
+  <link rel="icon" href="assets/icon.svg" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: radial-gradient(circle at top, #0f172a, #020617);
+      --glass: rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.12);
+      --primary: #6366f1;
+      --secondary: #a855f7;
+      --text-muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at top, #020617, #000);
+      color: white;
+    }
+
+    section { padding: 120px 8%; }
+
+    /* HERO */
+    .hero {
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: clamp(3rem, 6vw, 5rem);
+      font-weight: 900;
+      letter-spacing: -2px;
+    }
+
+    .hero p {
+      max-width: 720px;
+      margin: 30px auto 0;
+      font-size: 1.25rem;
+      color: var(--text-muted);
+    }
+
+    .hero .buttons {
+      margin-top: 50px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 18px 36px;
+      border-radius: 18px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--glass);
+      color: white;
+      backdrop-filter: blur(12px);
+      transition: all .3s ease;
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border: none;
+    }
+
+    .btn:hover { transform: translateY(-3px); }
+
+    /* FEATURES */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 30px;
+    }
+
+    .card {
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 30px;
+      backdrop-filter: blur(14px);
+      transition: transform .3s ease;
+    }
+
+    .card:hover { transform: translateY(-6px); }
+
+    .card h3 {
+      margin: 20px 0 10px;
+      font-size: 1.2rem;
+    }
+
+    .card p {
+      color: var(--text-muted);
+      font-size: .95rem;
+    }
+
+    .icon {
+      font-size: 2rem;
+      color: var(--primary);
+    }
+
+    /* STORY */
+    .story {
+      max-width: 900px;
+      margin: auto;
+      text-align: center;
+    }
+
+    .story h2 {
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+    }
+
+    .story p { color: var(--text-muted); font-size: 1.1rem; }
+
+    /* CTA */
+    .cta {
+      background: rgba(29, 32, 52, 0.05);
+      backdrop-filter: blur(2px);
+      border-radius: 40px;
+      padding: 100px 60px;
+      text-align: center;
+      margin-left: 10%;
+      box-shadow: 0 40px 120px rgba(41, 41, 41, 0.6);
+      width: 80%;
+      height: 400px;
+    }
+
+    .cta h2 {
+      font-size: 3rem;
+      font-weight: 900;
+      margin-bottom: 20px;
+    }
+
+    .cta p { font-size: 1.2rem; margin-bottom: 40px; }
+
+    /* FOOTER */
+    footer {
+      padding: 40px;
+      text-align: center;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+    }
+      
+    #stars {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <button id="theme-toggle" onclick="toggleTheme()" title="Changer le thème"><span id="theme-icon">☀️</span></button>
+  <style>
+    #theme-toggle{position:fixed;top:16px;right:20px;z-index:500;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:10px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;transition:all 0.2s;backdrop-filter:blur(8px);}
+    #theme-toggle:hover{background:rgba(255,255,255,0.14);transform:scale(1.08);}
+    body.light{background:#f0f4f8!important;color:#0f172a!important;}
+    body.light #stars{opacity:0.15;}
+    body.light .card{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.1);}
+    body.light .btn{background:rgba(0,0,0,0.06);border-color:rgba(0,0,0,0.12);color:#0f172a;}
+    body.light #theme-toggle{background:rgba(0,0,0,0.06);border-color:rgba(0,0,0,0.1);}
+    body.light footer{color:#64748b;border-color:rgba(0,0,0,0.1);}
+  </style>
+  <script>
+    (function(){var s=localStorage.getItem("orion-theme");if(s==="light"){document.body.classList.add("light");var e=document.getElementById("theme-icon");if(e)e.textContent="🌙";}})();
+    function toggleTheme(){var l=document.body.classList.toggle("light");document.getElementById("theme-icon").textContent=l?"🌙":"☀️";localStorage.setItem("orion-theme",l?"light":"dark");}
+  </script>
+
+
+  <section class="hero">
+    <h1>Orion</h1>
+    <p>
+      La plateforme moderne de cartographie et de supervision réseau.
+      Transformez un SI complexe en une vision claire, fiable et maîtrisée.
+    </p>
+    <div class="buttons">
+      <button class="btn primary" onclick="window.location.href='pricing.html'">Demander une démo</button>
+      <button class="btn" onclick="window.location.href='docs.html'">Documentation</button>
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="card">
+      <div class="icon">🌐</div>
+      <h3>Cartographie automatique</h3>
+      <p>Génération instantanée de schémas topologiques toujours à jour.</p>
+    </div>
+    <div class="card">
+      <div class="icon">📡</div>
+      <h3>Supervision temps réel</h3>
+      <p>Détection proactive des pannes et alertes intelligentes.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🧩</div>
+      <h3>Architecture modulaire</h3>
+      <p>Basée sur Docker pour s’adapter aux environnements complexes.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🔐</div>
+      <h3>Auto-hébergé</h3>
+      <p>Contrôle total de vos données et conformité professionnelle.</p>
+    </div>
+  </section>
+
+  <section class="story">
+    <h2>Pourquoi Orion ?</h2>
+    <p>
+      Dans le monde de l’IT, la documentation est souvent négligée car longue et coûteuse.
+      Orion automatise entièrement cette tâche critique : un seul script, moins de 5 minutes
+      d’installation, et une cartographie complète générée en moins de 30 minutes.
+    </p>
+  </section>
+
+  <section class="cta">
+    <h2>Suivez Orion</h2>
+    <p>
+      Comme les explorateurs d’autrefois, laissez Orion vous guider vers un SI
+      documenté, maîtrisé et performant.
+    </p>
+    <button class="btn" onclick="window.location.href='features.html'">Lancer l’exploration</button>
+  </section>
+
+  <footer>
+    © 2026 Orion — Cartographie & supervision réseau
+  </footer>
+
+  <canvas id="stars"></canvas>
+
+  <script>
+    const canvas = document.getElementById('stars');
+    const ctx = canvas.getContext('2d');
+    let w, h;
+    let stars = [];
+    const STAR_COUNT = 120;
+
+    function resize() {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    for (let i = 0; i < STAR_COUNT; i++) {
+      stars.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        vx: 0,
+        vy: 0
+      });
+    }
+
+    let mouse = { x: null, y: null };
+    window.addEventListener('mousemove', e => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
+
+    function draw() {
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = 'rgba(255,255,255,0.8)';
+
+      stars.forEach(s => {
+        if (mouse.x !== null) {
+          const dx = s.x - mouse.x;
+          const dy = s.y - mouse.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 150) {
+            s.vx += dx / dist * 0.05;
+            s.vy += dy / dist * 0.05;
+          }
+        }
+
+        s.x += s.vx;
+        s.y += s.vy;
+        s.vx *= 0.95;
+        s.vy *= 0.95;
+
+        if (s.x < 0) s.x = w;
+        if (s.x > w) s.x = 0;
+        if (s.y < 0) s.y = h;
+        if (s.y > h) s.y = 0;
+
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      for (let i = 0; i < stars.length; i++) {
+        for (let j = i + 1; j < stars.length; j++) {
+          const dx = stars[i].x - stars[j].x;
+          const dy = stars[i].y - stars[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 120) {
+            ctx.strokeStyle = 'rgba(99,102,241,0.15)';
+            ctx.beginPath();
+            ctx.moveTo(stars[i].x, stars[i].y);
+            ctx.lineTo(stars[j].x, stars[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      requestAnimationFrame(draw);
+    }
+
+    draw();
+  </script>
+
+  <!-- COMMAND PALETTE TRIGGER -->
+  <button id="cmd-trigger" onclick="openCmd()" title="Navigation (Ctrl+K)">
+    <span class="cmd-icon">⌘</span>
+    <span class="cmd-label">Navigation</span>
+    <kbd>K</kbd>
+  </button>
+
+  <!-- COMMAND PALETTE OVERLAY -->
+  <div id="cmd-overlay" onclick="closeCmd()">
+    <div id="cmd-palette" onclick="event.stopPropagation()">
+      <div id="cmd-header">
+        <span id="cmd-logo">✦ Orion</span>
+        <button id="cmd-close" onclick="closeCmd()">✕</button>
+      </div>
+      <div id="cmd-search-wrap">
+        <span id="cmd-search-icon">⌕</span>
+        <input id="cmd-input" type="text" placeholder="Naviguer vers..." oninput="filterCmd(this.value)" autocomplete="off" />
+      </div>
+      <div id="cmd-section-label">Pages</div>
+      <ul id="cmd-list">
+        <li class="cmd-item" data-href="index.html" data-keywords="accueil home">
+          <span class="cmd-item-icon">🏠</span>
+          <span class="cmd-item-text">
+            <span class="cmd-item-name">Accueil</span>
+            <span class="cmd-item-desc">Page principale</span>
+          </span>
+          <span class="cmd-item-kbd">↵</span>
+        </li>
+        <li class="cmd-item" data-href="features.html" data-keywords="fonctionnalités features snmp collecte architecture">
+          <span class="cmd-item-icon">⚡</span>
+          <span class="cmd-item-text">
+            <span class="cmd-item-name">Fonctionnalités</span>
+            <span class="cmd-item-desc">Ce qu'Orion fait</span>
+          </span>
+          <span class="cmd-item-kbd">↵</span>
+        </li>
+        <li class="cmd-item" data-href="pricing.html" data-keywords="tarification prix pricing community pro enterprise">
+          <span class="cmd-item-icon">💎</span>
+          <span class="cmd-item-text">
+            <span class="cmd-item-name">Tarification</span>
+            <span class="cmd-item-desc">Community · Pro · Enterprise</span>
+          </span>
+          <span class="cmd-item-kbd">↵</span>
+        </li>
+        <li class="cmd-item" data-href="roadmap.html" data-keywords="roadmap feuille route versions kanban">
+          <span class="cmd-item-icon">🗺️</span>
+          <span class="cmd-item-text">
+            <span class="cmd-item-name">Roadmap</span>
+            <span class="cmd-item-desc">Ce qui vient</span>
+          </span>
+          <span class="cmd-item-kbd">↵</span>
+        </li>
+        <li class="cmd-item" data-href="comparatif.html" data-keywords="comparatif librenms zabbix nagios prtg concurrence">
+          <span class="cmd-item-icon">⚖️</span>
+          <span class="cmd-item-text">
+            <span class="cmd-item-name">Comparatif</span>
+            <span class="cmd-item-desc">Orion vs la concurrence</span>
+          </span>
+          <span class="cmd-item-kbd">↵</span>
+        </li>
+        <li class="cmd-item" data-href="about.html" data-keywords="à propos équipe duckinc histoire bastien jade alexis michel">
+          <span class="cmd-item-icon">🦆</span>
+          <span class="cmd-item-text">
+            <span class="cmd-item-name">À propos</span>
+            <span class="cmd-item-desc">L'équipe DuckInc</span>
+          </span>
+          <span class="cmd-item-kbd">↵</span>
+        </li>
+        <li class="cmd-item" data-href="docs.html" data-keywords="documentation docs installation guide">
+          <span class="cmd-item-icon">📖</span>
+          <span class="cmd-item-text">
+            <span class="cmd-item-name">Documentation</span>
+            <span class="cmd-item-desc">Guide d'installation</span>
+          </span>
+          <span class="cmd-item-kbd">↵</span>
+        </li>
+        <li class="cmd-item" data-href="legal.html" data-keywords="legal mentions légales licence rgpd mit">
+          <span class="cmd-item-icon">📄</span>
+          <span class="cmd-item-text">
+            <span class="cmd-item-name">Mentions légales</span>
+            <span class="cmd-item-desc">Licence MIT · RGPD</span>
+          </span>
+          <span class="cmd-item-kbd">↵</span>
+        </li>
+      </ul>
+      <div id="cmd-footer">
+        <span><kbd>↑</kbd><kbd>↓</kbd> naviguer</span>
+        <span><kbd>↵</kbd> ouvrir</span>
+        <span><kbd>Esc</kbd> fermer</span>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    #cmd-trigger {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(10, 15, 35, 0.88);
+      border: 1px solid rgba(99,102,241,0.4);
+      border-radius: 14px;
+      padding: 10px 16px;
+      color: rgba(255,255,255,0.55);
+      font-family: "Inter", sans-serif;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      backdrop-filter: blur(16px);
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+    }
+    #cmd-trigger:hover {
+      border-color: rgba(99,102,241,0.75);
+      color: rgba(255,255,255,0.9);
+      box-shadow: 0 4px 32px rgba(0,0,0,0.6), 0 0 20px rgba(99,102,241,0.18);
+      transform: translateY(-2px);
+    }
+    .cmd-icon { font-size: 0.9rem; }
+    .cmd-label { letter-spacing: 0.3px; }
+    #cmd-trigger kbd {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 5px;
+      padding: 1px 6px;
+      font-size: 0.7rem;
+      font-family: inherit;
+      color: rgba(255,255,255,0.35);
+    }
+    #cmd-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      background: rgba(0,0,0,0.65);
+      backdrop-filter: blur(8px);
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 14vh;
+    }
+    #cmd-overlay.open { display: flex; animation: overlayIn 0.15s ease both; }
+    @keyframes overlayIn { from { opacity:0; } to { opacity:1; } }
+    #cmd-palette {
+      width: 100%;
+      max-width: 560px;
+      margin: 0 16px;
+      background: rgba(8, 12, 28, 0.97);
+      border: 1px solid rgba(99,102,241,0.35);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.75), 0 0 0 1px rgba(255,255,255,0.03) inset;
+      animation: paletteIn 0.2s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    @keyframes paletteIn {
+      from { opacity:0; transform:scale(0.95) translateY(-16px); }
+      to   { opacity:1; transform:scale(1) translateY(0); }
+    }
+    #cmd-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px 0;
+    }
+    #cmd-logo {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: rgba(99,102,241,0.7);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    #cmd-close {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      color: rgba(255,255,255,0.35);
+      font-size: 0.75rem;
+      padding: 4px 9px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    #cmd-close:hover { background: rgba(255,255,255,0.1); color: white; }
+    #cmd-search-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 20px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    #cmd-search-icon { font-size: 1.1rem; color: rgba(255,255,255,0.2); flex-shrink:0; }
+    #cmd-input {
+      flex: 1;
+      background: none;
+      border: none;
+      outline: none;
+      font-family: "Inter", sans-serif;
+      font-size: 1rem;
+      color: white;
+    }
+    #cmd-input::placeholder { color: rgba(255,255,255,0.2); }
+    #cmd-section-label {
+      padding: 10px 20px 4px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.2);
+    }
+    #cmd-list {
+      list-style: none;
+      padding: 4px 8px 8px;
+      max-height: 370px;
+      overflow-y: auto;
+    }
+    #cmd-list::-webkit-scrollbar { width: 3px; }
+    #cmd-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+    .cmd-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+    .cmd-item:hover, .cmd-item.selected { background: rgba(99,102,241,0.14); }
+    .cmd-item.hidden { display: none; }
+    .cmd-item-icon { font-size: 1.05rem; flex-shrink:0; width:26px; text-align:center; }
+    .cmd-item-text { flex:1; display:flex; flex-direction:column; gap:1px; }
+    .cmd-item-name { font-size: 0.875rem; font-weight: 500; color: rgba(255,255,255,0.88); }
+    .cmd-item-desc { font-size: 0.72rem; color: rgba(255,255,255,0.3); }
+    .cmd-item-kbd { font-size:0.65rem; color:rgba(255,255,255,0.18); opacity:0; transition:opacity 0.12s; }
+    .cmd-item:hover .cmd-item-kbd, .cmd-item.selected .cmd-item-kbd { opacity:1; }
+    #cmd-footer {
+      display: flex;
+      gap: 16px;
+      padding: 10px 20px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.22);
+    }
+    #cmd-footer kbd {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-family: inherit;
+      font-size: 0.65rem;
+    }
+  </style>
+
+  <script>
+    let cmdSelectedIndex = -1;
+
+    function openCmd() {
+      document.getElementById('cmd-overlay').classList.add('open');
+      setTimeout(() => document.getElementById('cmd-input').focus(), 80);
+      cmdSelectedIndex = -1;
+      updateSelection();
+    }
+
+    function closeCmd() {
+      document.getElementById('cmd-overlay').classList.remove('open');
+      document.getElementById('cmd-input').value = '';
+      filterCmd('');
+    }
+
+    function filterCmd(q) {
+      const items = document.querySelectorAll('.cmd-item');
+      const query = q.toLowerCase().trim();
+      cmdSelectedIndex = -1;
+      items.forEach(item => {
+        const name = item.querySelector('.cmd-item-name').textContent.toLowerCase();
+        const desc = item.querySelector('.cmd-item-desc').textContent.toLowerCase();
+        const kw   = (item.dataset.keywords || '').toLowerCase();
+        const match = !query || name.includes(query) || desc.includes(query) || kw.includes(query);
+        item.classList.toggle('hidden', !match);
+        item.classList.remove('selected');
+      });
+    }
+
+    function getVisible() {
+      return [...document.querySelectorAll('.cmd-item:not(.hidden)')];
+    }
+
+    function updateSelection() {
+      const visible = getVisible();
+      visible.forEach((el, i) => el.classList.toggle('selected', i === cmdSelectedIndex));
+      if (cmdSelectedIndex >= 0 && visible[cmdSelectedIndex]) {
+        visible[cmdSelectedIndex].scrollIntoView({ block: 'nearest' });
+      }
+    }
+
+    document.addEventListener('keydown', e => {
+      const overlay = document.getElementById('cmd-overlay');
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        overlay.classList.contains('open') ? closeCmd() : openCmd();
+        return;
+      }
+      if (!overlay.classList.contains('open')) return;
+      if (e.key === 'Escape') { closeCmd(); return; }
+      const visible = getVisible();
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        cmdSelectedIndex = Math.min(cmdSelectedIndex + 1, visible.length - 1);
+        updateSelection();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        cmdSelectedIndex = Math.max(cmdSelectedIndex - 1, 0);
+        updateSelection();
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        const sel = cmdSelectedIndex >= 0 ? visible[cmdSelectedIndex] : visible[0];
+        if (sel) window.location.href = sel.dataset.href;
+      }
+    });
+
+    document.querySelectorAll('.cmd-item').forEach(item => {
+      item.addEventListener('click', () => window.location.href = item.dataset.href);
+    });
+  </script>
+
+</body>
+</html>

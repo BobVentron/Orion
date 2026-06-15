@@ -1,0 +1,573 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+INSTALL_DIR="/usr/share/orion"
+CONFIG_DIR="/etc/orion"
+SSL_DIR="${CONFIG_DIR}/ssl"
+COMPOSE_FILE="${INSTALL_DIR}/docker-compose.yml"
+ENV_FILE="${CONFIG_DIR}/.env"
+SERVER_CONF="${CONFIG_DIR}/server.conf"
+DOCKER_PROJECT="orion"
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+NC='\033[0m'
+
+# ────────────────────────────────────────────────
+# Utilitaires
+# ────────────────────────────────────────────────
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
+
+# Lit ORION_HOST depuis /etc/orion/server.conf
+# Retourne "orion.local" si non défini
+get_orion_host() {
+    local host=""
+    if [[ -f "$SERVER_CONF" ]]; then
+        host=$(grep '^ORION_HOST=' "$SERVER_CONF" 2>/dev/null | cut -d= -f2 | tr -d '[:space:]')
+    fi
+    echo "${host:-orion.local}"
+}
+
+# Retourne "true" si la chaîne ressemble à une adresse IPv4
+is_ip_address() {
+    local val="$1"
+    if echo "$val" | grep -qE '^[0-9]{1,3}(\.[0-9]{1,3}){3}$'; then
+        echo "true"
+    else
+        echo "false"
+    fi
+}
+
+check_prerequisites() {
+    if ! command_exists docker; then
+        echo -e "${RED}Erreur : Docker n'est pas installé.${NC}"
+        exit 1
+    fi
+    if ! docker compose version >/dev/null 2>&1; then
+        echo -e "${RED}Erreur : docker compose n'est pas disponible.${NC}"
+        echo "Installez docker-compose-plugin ou docker-compose v1"
+        exit 1
+    fi
+    if [[ ! -f "$COMPOSE_FILE" ]]; then
+        echo -e "${RED}Erreur : docker-compose.yml non trouvé dans ${INSTALL_DIR}${NC}"
+        exit 1
+    fi
+}
+
+load_env() {
+    if [[ -f "$ENV_FILE" ]]; then
+        set -a
+        # shellcheck disable=SC1090
+        source "$ENV_FILE"
+        set +a
+    else
+        echo -e "${YELLOW}Attention : fichier .env non trouvé (${ENV_FILE})${NC}"
+    fi
+}
+
+# ────────────────────────────────────────────────
+# Gestion SSL
+# ────────────────────────────────────────────────
+
+ssl_self_signed() {
+    # ── Résolution du domaine/IP ──────────────────────────────────
+    # Priorité : argument CLI > server.conf > valeur par défaut
+    local DOMAIN="${1:-}"
+    if [[ -z "$DOMAIN" ]]; then
+        DOMAIN=$(get_orion_host)
+    fi
+    local DAYS="${2:-3650}"
+
+    local COUNTRY="FR"
+    local STATE="Loire"
+    local CITY="Saint-Etienne"
+    local ORG="Orion"
+
+    echo -e "${BLUE}=== Génération d'un certificat auto-signé ===${NC}"
+    echo "  Adresse  : ${DOMAIN}"
+    echo "  Validité : ${DAYS} jours"
+    echo ""
+
+    if ! command_exists openssl; then
+        echo -e "${RED}Erreur : openssl n'est pas installé.${NC}"
+        exit 1
+    fi
+
+    mkdir -p "$SSL_DIR"
+    chmod 700 "$SSL_DIR"
+
+    # Backup si un cert existe déjà
+    if [[ -f "${SSL_DIR}/orion.crt" ]]; then
+        local BACKUP_TS
+        BACKUP_TS=$(date +%Y%m%d_%H%M%S)
+        cp "${SSL_DIR}/orion.crt" "${SSL_DIR}/orion.crt.bak.${BACKUP_TS}"
+        cp "${SSL_DIR}/orion.key" "${SSL_DIR}/orion.key.bak.${BACKUP_TS}"
+        echo -e "${YELLOW}⚠ Anciens certificats sauvegardés (*.bak.${BACKUP_TS})${NC}"
+    fi
+
+    # ── Construction de la section [alt_names] ────────────────────
+    # Si DOMAIN est une IP → IP.x dans le SAN (DNS.x ne fonctionne
+    # pas pour les adresses IP dans les navigateurs modernes)
+    # Si DOMAIN est un nom → DNS.x dans le SAN
+    local ALT_NAMES
+    if [[ "$(is_ip_address "$DOMAIN")" == "true" ]]; then
+        ALT_NAMES="[alt_names]
+IP.1  = ${DOMAIN}
+IP.2  = 127.0.0.1
+DNS.1 = localhost"
+    else
+        ALT_NAMES="[alt_names]
+DNS.1 = ${DOMAIN}
+DNS.2 = localhost
+IP.1  = 127.0.0.1"
+    fi
+
+    # ── Génération avec SAN (requis par Chrome/Firefox) ───────────
+    local TMP_CNF
+    TMP_CNF=$(mktemp)
+    cat > "$TMP_CNF" << EOF
+[req]
+default_bits       = 2048
+prompt             = no
+default_md         = sha256
+distinguished_name = dn
+x509_extensions    = v3_req
+
+[dn]
+C  = ${COUNTRY}
+ST = ${STATE}
+L  = ${CITY}
+O  = ${ORG}
+CN = ${DOMAIN}
+
+[v3_req]
+subjectAltName   = @alt_names
+keyUsage         = critical, digitalSignature, keyEncipherment
+extendedKeyUsage = serverAuth
+basicConstraints = CA:FALSE
+
+${ALT_NAMES}
+EOF
+
+    openssl req -x509 -nodes \
+        -days "$DAYS" \
+        -newkey rsa:2048 \
+        -keyout "${SSL_DIR}/orion.key" \
+        -out    "${SSL_DIR}/orion.crt" \
+        -config "$TMP_CNF" 2>/dev/null
+
+    rm -f "$TMP_CNF"
+
+    chmod 600 "${SSL_DIR}/orion.key"
+    chmod 644 "${SSL_DIR}/orion.crt"
+    chown root:root "${SSL_DIR}/orion.key" "${SSL_DIR}/orion.crt"
+
+    echo -e "${GREEN}✔ Certificat généré :${NC}"
+    echo "   ${SSL_DIR}/orion.crt"
+    echo "   ${SSL_DIR}/orion.key"
+    echo ""
+    openssl x509 -in "${SSL_DIR}/orion.crt" -noout -subject -dates 2>/dev/null
+    echo ""
+
+    # SAN effectifs pour vérification
+    echo "SAN (Subject Alternative Names) :"
+    openssl x509 -in "${SSL_DIR}/orion.crt" -noout -text 2>/dev/null \
+        | grep -A1 "Subject Alternative Name" \
+        | tail -1 \
+        | sed 's/^[[:space:]]*/   /'
+
+    _ssl_update_env
+
+    echo ""
+    echo -e "${YELLOW}⚠ Certificat auto-signé : les navigateurs afficheront un avertissement.${NC}"
+    if [[ "$(is_ip_address "$DOMAIN")" == "true" ]]; then
+        echo "  Connectez-vous via : ${CYAN}https://${DOMAIN}${NC}"
+        echo "  Pour supprimer l'avertissement, importez orion.crt dans le magasin de confiance."
+    else
+        echo "  Connectez-vous via : ${CYAN}https://${DOMAIN}${NC}"
+        echo "  Pour un cert valide sans avertissement, utilisez : orion-control ssl import"
+    fi
+    echo ""
+    echo "Redémarrez le service web pour appliquer : ${GREEN}orion-control restart web${NC}"
+}
+
+ssl_import() {
+    local CERT_FILE="${1:-}"
+    local KEY_FILE="${2:-}"
+
+    if [[ -z "$CERT_FILE" || -z "$KEY_FILE" ]]; then
+        echo -e "${RED}Usage : orion-control ssl import <chemin/vers/cert.crt> <chemin/vers/cert.key>${NC}"
+        echo ""
+        echo "Exemples :"
+        echo "  orion-control ssl import /tmp/mon-domaine.crt /tmp/mon-domaine.key"
+        echo "  orion-control ssl import /etc/letsencrypt/live/mondomaine.com/fullchain.pem \\"
+        echo "                           /etc/letsencrypt/live/mondomaine.com/privkey.pem"
+        exit 1
+    fi
+
+    if [[ ! -f "$CERT_FILE" ]]; then
+        echo -e "${RED}Erreur : certificat introuvable : ${CERT_FILE}${NC}"
+        exit 1
+    fi
+    if [[ ! -f "$KEY_FILE" ]]; then
+        echo -e "${RED}Erreur : clé privée introuvable : ${KEY_FILE}${NC}"
+        exit 1
+    fi
+
+    echo -e "${BLUE}=== Import d'un certificat personnalisé ===${NC}"
+
+    # Validation : vérifier que la clé correspond au certificat
+    echo "Vérification de la cohérence certificat / clé..."
+    local CERT_MOD KEY_MOD
+    CERT_MOD=$(openssl x509 -noout -modulus -in "$CERT_FILE" 2>/dev/null | md5sum)
+    KEY_MOD=$(openssl rsa  -noout -modulus -in "$KEY_FILE"  2>/dev/null | md5sum)
+
+    if [[ "$CERT_MOD" != "$KEY_MOD" ]]; then
+        echo -e "${RED}✖ La clé privée ne correspond pas au certificat.${NC}"
+        exit 1
+    fi
+    echo -e "${GREEN}✔ Clé privée cohérente avec le certificat${NC}"
+
+    echo ""
+    echo "Informations du certificat :"
+    openssl x509 -in "$CERT_FILE" -noout -subject -issuer -dates 2>/dev/null
+    echo "SAN :"
+    openssl x509 -in "$CERT_FILE" -noout -text 2>/dev/null \
+        | grep -A1 "Subject Alternative Name" \
+        | tail -1 \
+        | sed 's/^[[:space:]]*/   /'
+    echo ""
+
+    mkdir -p "$SSL_DIR"
+    chmod 700 "$SSL_DIR"
+
+    # Backup si un cert existe déjà
+    if [[ -f "${SSL_DIR}/orion.crt" ]]; then
+        local BACKUP_TS
+        BACKUP_TS=$(date +%Y%m%d_%H%M%S)
+        cp "${SSL_DIR}/orion.crt" "${SSL_DIR}/orion.crt.bak.${BACKUP_TS}"
+        cp "${SSL_DIR}/orion.key" "${SSL_DIR}/orion.key.bak.${BACKUP_TS}"
+        echo -e "${YELLOW}⚠ Anciens certificats sauvegardés (*.bak.${BACKUP_TS})${NC}"
+    fi
+
+    cp "$CERT_FILE" "${SSL_DIR}/orion.crt"
+    cp "$KEY_FILE"  "${SSL_DIR}/orion.key"
+
+    chmod 600 "${SSL_DIR}/orion.key"
+    chmod 644 "${SSL_DIR}/orion.crt"
+    chown root:root "${SSL_DIR}/orion.key" "${SSL_DIR}/orion.crt"
+
+    echo -e "${GREEN}✔ Certificat importé dans ${SSL_DIR}${NC}"
+
+    _ssl_update_env
+
+    echo ""
+    echo "Redémarrez le service web pour appliquer : ${GREEN}orion-control restart web${NC}"
+}
+
+ssl_status() {
+    local ORION_HOST
+    ORION_HOST=$(get_orion_host)
+
+    echo -e "${BLUE}=== Statut SSL ===${NC}"
+    echo "  Adresse configurée : ${CYAN}${ORION_HOST}${NC}"
+    echo ""
+
+    if [[ ! -f "${SSL_DIR}/orion.crt" ]]; then
+        echo -e "${YELLOW}Aucun certificat trouvé dans ${SSL_DIR}${NC}"
+        echo "Le certificat de secours intégré à l'image Docker est utilisé."
+        echo ""
+        echo "Pour générer un cert avec l'adresse ${ORION_HOST} :"
+        echo "  orion-control ssl self-signed"
+        return
+    fi
+
+    echo "Fichier : ${SSL_DIR}/orion.crt"
+    echo ""
+    openssl x509 -in "${SSL_DIR}/orion.crt" -noout -text 2>/dev/null | \
+        grep -E "(Subject:|Issuer:|Not Before|Not After|DNS:|IP Address)" | sed 's/^/  /'
+
+    # Vérification expiration
+    local EXPIRY
+    EXPIRY=$(openssl x509 -in "${SSL_DIR}/orion.crt" -noout -enddate 2>/dev/null | cut -d= -f2)
+    local EXPIRY_EPOCH NOW_EPOCH DAYS_LEFT
+    EXPIRY_EPOCH=$(date -d "$EXPIRY" +%s 2>/dev/null || date -j -f "%b %d %T %Y %Z" "$EXPIRY" +%s 2>/dev/null)
+    NOW_EPOCH=$(date +%s)
+    DAYS_LEFT=$(( (EXPIRY_EPOCH - NOW_EPOCH) / 86400 ))
+
+    echo ""
+    if [[ $DAYS_LEFT -lt 30 ]]; then
+        echo -e "  ${RED}⚠ Expire dans ${DAYS_LEFT} jours !${NC}"
+    elif [[ $DAYS_LEFT -lt 90 ]]; then
+        echo -e "  ${YELLOW}⚠ Expire dans ${DAYS_LEFT} jours${NC}"
+    else
+        echo -e "  ${GREEN}✔ Valide encore ${DAYS_LEFT} jours${NC}"
+    fi
+}
+
+# Met à jour le .env pour indiquer le dossier SSL à monter
+_ssl_update_env() {
+    if [[ ! -f "$ENV_FILE" ]]; then
+        mkdir -p "$CONFIG_DIR"
+        touch "$ENV_FILE"
+        chmod 600 "$ENV_FILE"
+    fi
+    sed -i '/^ORION_SSL_DIR=/d' "$ENV_FILE"
+    echo "ORION_SSL_DIR=${SSL_DIR}" >> "$ENV_FILE"
+    echo -e "${GREEN}✔ ORION_SSL_DIR=${SSL_DIR} mis à jour dans ${ENV_FILE}${NC}"
+}
+
+# ────────────────────────────────────────────────
+# Commandes principales
+# ────────────────────────────────────────────────
+
+case "${1:-help}" in
+
+    check|verify)
+        echo "Vérification de la capacité à déployer Orion..."
+        check_prerequisites
+
+        echo -e "${GREEN}✔ Docker & docker compose sont présents${NC}"
+
+        if [[ -f "$ENV_FILE" ]]; then
+            echo -e "${GREEN}✔ Fichier de configuration trouvé${NC}"
+        else
+            echo -e "${YELLOW}⚠ Fichier .env absent — sera créé au déploiement${NC}"
+        fi
+
+        # Vérification de l'adresse configurée
+        ORION_HOST=$(get_orion_host)
+        if [[ "$ORION_HOST" == "orion.local" ]] && [[ ! -f "$SERVER_CONF" ]]; then
+            echo -e "${YELLOW}⚠ Adresse serveur non configurée (server.conf absent)${NC}"
+            echo "  → Relancez l'installation ou créez /etc/orion/server.conf manuellement :"
+            echo "    echo 'ORION_HOST=<votre-ip>' > /etc/orion/server.conf"
+        else
+            echo -e "${GREEN}✔ Adresse serveur configurée : ${ORION_HOST}${NC}"
+        fi
+
+        echo "Vérification connexion internet..."
+        if curl -s -m 5 -o /dev/null https://1.1.1.1; then
+            echo -e "${GREEN}✔ Connexion internet OK${NC}"
+        else
+            echo -e "${RED}✖ Pas de connexion internet détectée${NC}"
+            exit 1
+        fi
+
+        # Vérification SSL
+        if [[ -f "${SSL_DIR}/orion.crt" ]]; then
+            echo -e "${GREEN}✔ Certificat SSL trouvé dans ${SSL_DIR}${NC}"
+        else
+            echo -e "${YELLOW}⚠ Aucun certificat SSL — sera généré automatiquement pour ${ORION_HOST} au deploy${NC}"
+        fi
+
+        echo -e "\n${GREEN}Tout semble correct pour le déploiement.${NC}"
+        ;;
+
+    deploy|install)
+        echo "Déploiement de la stack Orion..."
+
+        check_prerequisites
+        load_env
+
+        ORION_HOST=$(get_orion_host)
+        echo -e "  Adresse serveur : ${CYAN}${ORION_HOST}${NC}"
+
+        cd "$INSTALL_DIR" || { echo "Impossible d'accéder à ${INSTALL_DIR}"; exit 1; }
+
+        if [[ ! -f "$ENV_FILE" ]]; then
+            echo "Création du fichier de configuration..."
+            POSTGRES_PWD=$(openssl rand -base64 32 | tr -dc 'a-zA-Z0-9!@#$%^&*()_+-=' | head -c 40)
+
+            mkdir -p "$CONFIG_DIR"
+            chmod 700 "$CONFIG_DIR"
+
+            cat > "$ENV_FILE" << EOF
+POSTGRES_PASSWORD=${POSTGRES_PWD}
+POSTGRES_PORT=5432
+API_PORT=3000
+ORION_SSL_DIR=${SSL_DIR}
+EOF
+            chmod 600 "$ENV_FILE"
+            chown root:root "$ENV_FILE"
+            echo -e "${GREEN}→ Fichier .env généré${NC}"
+        fi
+
+        # Génération du cert auto-signé si aucun cert n'est présent
+        if [[ ! -f "${SSL_DIR}/orion.crt" ]]; then
+            echo ""
+            echo -e "${YELLOW}Aucun certificat SSL trouvé.${NC}"
+            echo "Génération d'un certificat auto-signé pour : ${CYAN}${ORION_HOST}${NC}"
+            ssl_self_signed "$ORION_HOST" "3650"
+        fi
+
+        load_env
+
+        echo "Lancement de la stack..."
+        docker compose pull
+        docker compose up -d --remove-orphans
+
+        echo "Attente que la base PostgreSQL soit prête..."
+        for i in {1..30}; do
+            if docker compose exec -T db pg_isready -U orion_admin -d orion_db >/dev/null 2>&1; then
+                echo -e "${GREEN}Base de données prête !${NC}"
+                break
+            fi
+            echo -n "."
+            sleep 2
+        done
+
+        echo -e "\n${GREEN}Déploiement terminé.${NC}"
+        echo "  HTTP  → redirigé vers HTTPS automatiquement"
+        echo "  HTTPS → ${CYAN}https://${ORION_HOST}${NC}"
+        echo ""
+        echo -e "${YELLOW}⚠ Certificat auto-signé : votre navigateur affichera un avertissement.${NC}"
+        echo "  Pour l'éviter, importez le cert dans votre magasin de confiance :"
+        echo "    ${SSL_DIR}/orion.crt"
+        echo "  Ou importez un vrai certificat : ${GREEN}orion-control ssl import <crt> <key>${NC}"
+        ;;
+
+    restart)
+        load_env
+        cd "$INSTALL_DIR" || exit 1
+        SERVICE="${2:-}"
+        if [[ -n "$SERVICE" ]]; then
+            docker compose restart "$SERVICE"
+            echo -e "${GREEN}Service ${SERVICE} redémarré.${NC}"
+        else
+            docker compose restart
+            echo -e "${GREEN}Stack redémarrée.${NC}"
+        fi
+        ;;
+
+    status)
+        load_env
+        cd "$INSTALL_DIR" || exit 1
+        docker compose ps
+        ;;
+
+    logs)
+        cd "$INSTALL_DIR" || exit 1
+        if [[ -n "${2:-}" ]]; then
+            docker compose logs -f --tail=200 "$2"
+        else
+            docker compose logs -f --tail=100
+        fi
+        ;;
+
+    stop)
+        cd "$INSTALL_DIR" || exit 1
+        docker compose down
+        echo -e "${GREEN}Stack arrêtée.${NC}"
+        ;;
+
+    clear)
+        cd "$INSTALL_DIR" || exit 1
+        docker compose down --volumes --rmi local
+        echo -e "${GREEN}Stack arrêtée et volumes supprimés.${NC}"
+        ;;
+
+    update|upgrade)
+        echo "Mise à jour de la stack Orion..."
+        check_prerequisites
+        load_env
+        cd "$INSTALL_DIR" || exit 1
+        docker compose pull
+        docker compose up -d --remove-orphans --force-recreate
+        echo -e "${GREEN}Mise à jour terminée.${NC}"
+        ;;
+
+    # ────────────────────────────────────────────────
+    # Commandes SSL
+    # ────────────────────────────────────────────────
+    ssl)
+        SUBCMD="${2:-help}"
+        case "$SUBCMD" in
+            self-signed)
+                # Argument optionnel : domaine/IP personnalisé
+                # Sans argument → utilise ORION_HOST de server.conf
+                DOMAIN="${3:-}"
+                DAYS="${4:-3650}"
+                ssl_self_signed "$DOMAIN" "$DAYS"
+                ;;
+            import)
+                ssl_import "${3:-}" "${4:-}"
+                ;;
+            status)
+                ssl_status
+                ;;
+            help|*)
+                echo "Usage : orion-control ssl <sous-commande> [options]"
+                echo ""
+                echo "Sous-commandes :"
+                echo "  self-signed [domaine|ip] [jours]"
+                echo "                               Génère un certificat auto-signé"
+                echo "                               Sans argument : utilise l'adresse configurée"
+                echo "                               lors de l'installation (server.conf)"
+                echo "                               Fonctionne avec une IP ou un nom de domaine"
+                echo ""
+                echo "  import <cert.crt> <cert.key> Importe un certificat existant"
+                echo "                               (Let's Encrypt, CA interne…)"
+                echo "                               Vérifie la cohérence cert/clé avant import"
+                echo ""
+                echo "  status                       Affiche les infos du certificat actif"
+                echo ""
+                echo "Exemples :"
+                echo "  orion-control ssl self-signed"
+                echo "  orion-control ssl self-signed 192.168.1.100"
+                echo "  orion-control ssl self-signed mon-orion.lan 365"
+                echo "  orion-control ssl import /etc/letsencrypt/live/mondomaine.com/fullchain.pem \\"
+                echo "                           /etc/letsencrypt/live/mondomaine.com/privkey.pem"
+                echo "  orion-control ssl status"
+                ;;
+        esac
+        ;;
+
+    help|-h|--help)
+        echo "Usage : orion-control <commande> [options]"
+        echo ""
+        echo "── Stack ──────────────────────────────────────────────────────"
+        echo "  check                        Vérifie prérequis, config et certificat SSL"
+        echo "  deploy                       Déploie la stack (génère .env et cert SSL si absents)"
+        echo "  status                       Affiche l'état des conteneurs"
+        echo "  logs [service]               Logs en direct (tous les services ou un seul)"
+        echo "  restart [service]            Redémarre la stack ou un service"
+        echo "  stop                         Arrête la stack"
+        echo "  update                       Met à jour les images et redémarre"
+        echo "  clear                        Arrête la stack et supprime les volumes"
+        echo ""
+        echo "── SSL ─────────────────────────────────────────────────────────"
+        echo "  ssl self-signed [domaine|ip] [jours]"
+        echo "                               Génère un certificat auto-signé"
+        echo "                               Supporte IP et noms de domaine"
+        echo "                               Sans argument : utilise l'adresse de l'installation"
+        echo ""
+        echo "  ssl import <cert.crt> <cert.key>"
+        echo "                               Importe un certificat existant"
+        echo "                               (Let's Encrypt, CA interne…)"
+        echo ""
+        echo "  ssl status                   Affiche les infos et la durée de validité"
+        echo ""
+        echo "── Exemples ────────────────────────────────────────────────────"
+        echo "  orion-control deploy"
+        echo "  orion-control logs api"
+        echo "  orion-control restart web"
+        echo "  orion-control ssl self-signed"
+        echo "  orion-control ssl self-signed 192.168.1.100"
+        echo "  orion-control ssl import /etc/letsencrypt/live/mon-domaine.com/fullchain.pem \\"
+        echo "                           /etc/letsencrypt/live/mon-domaine.com/privkey.pem"
+        echo "  orion-control ssl status"
+        ;;
+
+    *)
+        echo -e "${RED}Commande inconnue : $1${NC}"
+        echo "Utilisez : orion-control help"
+        exit 1
+        ;;
+esac
+
+exit 0

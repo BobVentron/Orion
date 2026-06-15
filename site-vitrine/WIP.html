@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Orion — Work in Progress</title>
+  <link rel="icon" href="assets/icon.svg" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at top, #020617, #000);
+      color: white;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      text-align: center;
+      width: 90%;
+      max-width: 900px;
+    }
+
+    h1 {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 800;
+      margin-bottom: 20px;
+    }
+
+    p {
+      color: #94a3b8;
+      margin-bottom: 60px;
+      font-size: 1.1rem;
+    }
+
+    /* Progress bar */
+    .progress-wrapper {
+      position: relative;
+      height: 14px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 999px;
+      overflow: visible;
+    }
+
+    .progress {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #6366f1, #a855f7);
+      border-radius: 999px;
+      transition: width .2s linear;
+    }
+
+    /* Duck */
+    .duck {
+      position: absolute;
+      top: -42px;
+      left: 0;
+      font-size: 38px;
+      transform-origin: center;
+      animation: waddle .4s infinite alternate ease-in-out;
+      user-select: none;
+    }
+
+    @keyframes waddle {
+      from { transform: rotate(-4deg) translateY(0); }
+      to { transform: rotate(4deg) translateY(2px); }
+    }
+
+    .status {
+      margin-top: 40px;
+      font-size: 1.2rem;
+      color: #c7d2fe;
+      font-weight: 600;
+    }
+
+    footer {
+      position: fixed;
+      bottom: 20px;
+      width: 100%;
+      text-align: center;
+      color: #64748b;
+      font-size: .9rem;
+    }
+    canvas#stars {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+}
+
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Work in Progress</h1>
+    <p>
+      Orion explore encore votre infrastructure…
+      Notre canard réseau supervise l’avancement.
+    </p>
+
+    <div class="progress-wrapper">
+      <div class="progress" id="progress"></div>
+      <div class="duck" id="duck"><img src="assets/duckinc.svg" alt="Duck" style="width:38px;height:38px;"></div>
+    </div>
+
+    <div class="status" id="status">Initialisation…</div>
+  </div>
+
+  <footer>© 2026 Orion — Supervision réseau intelligente</footer>
+  <canvas id="stars"></canvas>
+
+  <script>
+    
+    const progress = document.getElementById('progress');
+    const duck = document.getElementById('duck');
+    const status = document.getElementById('status');
+
+    const messages = [
+      'Cartographie des équipements…',
+      'Analyse des flux réseau…',
+      'Découverte des dépendances…',
+      'Génération du schéma topologique…',
+      'Finalisation…'
+    ];
+
+    let value = 0;
+    let msgIndex = 0;
+    let stopTime = 0;
+
+    function update() {
+      if (stopTime > 0) {
+        stopTime--;
+        requestAnimationFrame(update);
+        return;
+      }
+      if (stopTime == 0){
+        let rando = Math.random();
+        if (rando < 0.3) {
+            stopTime = Math.floor(Math.random() * 15); // pauses aléatoires
+        }
+      }
+
+      value += Math.random(); // plus lent
+
+      progress.style.width = value + '%';
+      duck.style.left = `calc(${value}% - 18px)`;
+
+      if (value > msgIndex * 20 && msgIndex < messages.length) {
+        status.textContent = messages[msgIndex];
+        msgIndex++;
+      }
+
+
+      if (value >= 200) {
+        setTimeout(() => {
+          value = 0;
+          msgIndex = 0;
+          status.textContent = 'Initialisation…';
+          duck.innerHTML = '<img src="assets/duckinc.svg" alt="Duck" style="width:38px;height:38px;">';
+        }, 1200);
+      }
+
+      requestAnimationFrame(update);
+    }
+
+    update();
+
+
+    const canvas = document.getElementById('stars');
+    const ctx = canvas.getContext('2d');
+    let w, h;
+    let stars = [];
+    const STAR_COUNT = 120;
+
+    function WIP()
+    {
+      window.location.href = 'WIP.html';
+    }
+    function resize() {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    for (let i = 0; i < STAR_COUNT; i++) {
+      stars.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        vx: 0,
+        vy: 0
+      });
+    }
+
+    let mouse = { x: null, y: null };
+    window.addEventListener('mousemove', e => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
+
+    function draw() {
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = 'rgba(255,255,255,0.8)';
+
+      stars.forEach(s => {
+        if (mouse.x !== null) {
+          const dx = s.x - mouse.x;
+          const dy = s.y - mouse.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 150) {
+            s.vx += dx / dist * 0.05;
+            s.vy += dy / dist * 0.05;
+          }
+        }
+
+        s.x += s.vx;
+        s.y += s.vy;
+        s.vx *= 0.95;
+        s.vy *= 0.95;
+
+        if (s.x < 0) s.x = w;
+        if (s.x > w) s.x = 0;
+        if (s.y < 0) s.y = h;
+        if (s.y > h) s.y = 0;
+
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      for (let i = 0; i < stars.length; i++) {
+        for (let j = i + 1; j < stars.length; j++) {
+          const dx = stars[i].x - stars[j].x;
+          const dy = stars[i].y - stars[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 120) {
+            ctx.strokeStyle = 'rgba(99,102,241,0.15)';
+            ctx.beginPath();
+            ctx.moveTo(stars[i].x, stars[i].y);
+            ctx.lineTo(stars[j].x, stars[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      requestAnimationFrame(draw);
+    }
+
+    draw();
+
+  </script>
+
+</body>
+
+</html>
