@@ -1,0 +1,11 @@
+Package: orion
+Version: 0.5.3
+Section: utils
+Priority: optional
+Architecture: all
+Depends: docker.io | docker-ce, docker-compose-plugin | docker-compose
+Maintainer: Bastien Soleilhac <bastien@soleilhac.me>
+Description: Outil de cartographie réseau
+ Paquet de déploiement pour Orion.
+Homepage: https://orion.duckinc.soleilhac.me/
+

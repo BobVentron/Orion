@@ -1,0 +1,62 @@
+#!/bin/sh
+# preinst — Vérifications légères AVANT installation d'Orion.
+#
+# ⚠  Ce script s'exécute AVANT que les dépendances (docker, etc.)
+#    soient configurées par dpkg. Ne pas tenter de les démarrer ici.
+#    Le démarrage de Docker est géré dans postinst.
+
+set -e
+
+MIN_RAM_MB=4096
+PORTS_TO_CHECK="80 443 3000"
+
+if [ "$1" != "install" ] && [ "$1" != "upgrade" ]; then
+    exit 0
+fi
+
+echo "→ Vérification pré-installation Orion..."
+
+# 1. Système Debian/Ubuntu uniquement
+if [ ! -f /etc/debian_version ]; then
+    echo "ERREUR : Ce paquet est conçu pour Debian/Ubuntu uniquement." >&2
+    exit 1
+fi
+
+# 2. Mémoire disponible (avertissement interactif, non bloquant)
+FREE_RAM_KB=$(free -k | awk '/^Mem:/ {print $4}')
+FREE_RAM_MB=$((FREE_RAM_KB / 1024))
+
+if [ "$FREE_RAM_MB" -lt "$MIN_RAM_MB" ]; then
+    echo ""
+    echo "⚠️  Mémoire disponible faible : ${FREE_RAM_MB} Mo (recommandé ≥ ${MIN_RAM_MB} Mo)" >&2
+    echo "    La stack Docker (PostgreSQL + API + frontend) peut être lente ou instable."
+    echo ""
+    echo -n "Continuer malgré tout ? [o/N] "
+    read -r REPLY
+    case "$REPLY" in
+        [oO]|[oO][uU][iI])
+            echo "→ Continuation malgré la RAM faible."
+            ;;
+        *)
+            echo "→ Installation annulée."
+            exit 1
+            ;;
+    esac
+fi
+
+# 3. Avertissement ports occupés (non bloquant)
+for port in $PORTS_TO_CHECK; do
+    if ss -ltn 2>/dev/null | grep -q "[: ]${port} "; then
+        echo "⚠️  Port ${port} déjà utilisé par un autre processus." >&2
+    fi
+done
+
+# 4. Contexte upgrade/install
+if [ -n "$2" ]; then
+    echo "→ Mise à jour détectée (version précédente : $2)"
+else
+    echo "→ Première installation."
+fi
+
+echo "→ Vérifications pré-installation terminées."
+exit 0
