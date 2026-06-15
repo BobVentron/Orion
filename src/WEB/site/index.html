@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orion - Accueil</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="site-name" style="padding:0;margin-right:40px;">
+            <img src="assets/icon.svg" alt="Orion" style="height:36px;width:auto;vertical-align:middle;display:block;">
+        </div>
+        <ul>
+            <li><a href="index.html">Accueil</a></li>
+            <li><a href="html/carto.html">Cartographie</a></li>
+            <li class="accordion-menu">
+                <span class="accordion-link" tabindex="0">Équipements ▼</span>
+                <ul class="submenu">
+                    <li><a href="html/list.html">Tout</a></li>
+                    <li><a href="html/list.html">Endpoint</a></li>
+                    <li><a href="html/list.html">Réseaux</a></li>
+                </ul>
+            </li>
+            <li><a href="html/config.html">Paramétrage</a></li>
+        </ul>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-inner">
+            <div class="hero-badge">
+                <span class="badge-dot"></span>
+                Système opérationnel
+            </div>
+            <h1 class="hero-title">ORION</h1>
+            <p class="hero-sub">Cartographie &amp; supervision réseau</p>
+            <div class="hero-cta">
+                <a href="html/carto.html" class="btn-primary-hero">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M12 2v3M12 19v3M2 12h3M19 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/>
+                    </svg>
+                    Explorer la carte
+                </a>
+                <a href="html/list.html" class="btn-ghost-hero">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <rect x="2" y="3" width="20" height="4" rx="1"/>
+                        <rect x="2" y="10" width="20" height="4" rx="1"/>
+                        <rect x="2" y="17" width="20" height="4" rx="1"/>
+                    </svg>
+                    Inventaire
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- STATS BAND -->
+    <div class="stats-band">
+        <div class="stat-item loading" id="stat-devices">
+            <span class="stat-val">—</span>
+            <span class="stat-label">Équipements</span>
+        </div>
+        <div class="stat-sep"></div>
+        <div class="stat-item loading" id="stat-online">
+            <span class="stat-val green">—</span>
+            <span class="stat-label">En ligne</span>
+        </div>
+        <div class="stat-sep"></div>
+        <div class="stat-item loading" id="stat-offline">
+            <span class="stat-val red">—</span>
+            <span class="stat-label">Hors ligne</span>
+        </div>
+        <div class="stat-sep"></div>
+        <div class="stat-item loading" id="stat-links">
+            <span class="stat-val">—</span>
+            <span class="stat-label">Liens réseau</span>
+        </div>
+        <div class="stat-sep"></div>
+        <div class="stat-item loading" id="stat-maps">
+            <span class="stat-val">—</span>
+            <span class="stat-label">Cartes</span>
+        </div>
+    </div>
+
+    <!-- NAVIGATION PRINCIPALE -->
+    <section class="section">
+        <div class="section-header">
+            <div class="section-label">Navigation principale</div>
+            <h2 class="section-title">Accès rapide</h2>
+        </div>
+
+        <div class="cards-grid">
+
+            <a href="html/carto.html" class="feat-card reveal">
+                <div class="feat-icon">
+                    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="3"/>
+                        <circle cx="12" cy="12" r="9" stroke-dasharray="3 2"/>
+                        <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
+                    </svg>
+                </div>
+                <div class="feat-body">
+                    <div class="feat-title">Cartographie réseau</div>
+                    <p class="feat-desc">Topologie interactive avec liens LLDP, statuts ICMP en temps réel et métriques par équipement.</p>
+                </div>
+                <div class="feat-footer">
+                    <span class="feat-count" id="count-maps">— cartes</span>
+                    <span class="feat-arrow">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </span>
+                </div>
+            </a>
+
+            <a href="html/list.html" class="feat-card reveal">
+                <div class="feat-icon">
+                    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                        <rect x="2" y="2" width="20" height="8" rx="2"/>
+                        <rect x="2" y="14" width="20" height="8" rx="2"/>
+                        <circle cx="6" cy="6" r="1.2" fill="currentColor" stroke="none"/>
+                        <circle cx="6" cy="18" r="1.2" fill="currentColor" stroke="none"/>
+                        <path d="M10 6h8M10 18h8"/>
+                    </svg>
+                </div>
+                <div class="feat-body">
+                    <div class="feat-title">Inventaire équipements</div>
+                    <p class="feat-desc">Switchs, routeurs, firewalls et serveurs avec modèle, firmware, localisation et état SNMP.</p>
+                </div>
+                <div class="feat-footer">
+                    <span class="feat-count" id="count-devices">— équipements</span>
+                    <span class="feat-arrow">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </span>
+                </div>
+            </a>
+
+            <a href="html/config.html" class="feat-card reveal">
+                <div class="feat-icon">
+                    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                        <path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/>
+                        <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+                    </svg>
+                </div>
+                <div class="feat-body">
+                    <div class="feat-title">Paramétrage</div>
+                    <p class="feat-desc">Profils SNMP et SSH, réseaux à scanner, utilisateurs, rétention des logs et style de la carte.</p>
+                </div>
+                <div class="feat-footer">
+                    <span class="feat-count" id="count-scan-profiles">— profils actifs</span>
+                    <span class="feat-arrow">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </span>
+                </div>
+            </a>
+
+        </div>
+    </section>
+
+    <!-- ACTIVITÉ -->
+    <section class="section section-alt">
+        <div class="section-header">
+            <div>
+                <div class="section-label">Découverte réseau</div>
+                <h2 class="section-title">Activité</h2>
+            </div>
+            <span class="sys-time" id="sys-time">--:--:-- UTC</span>
+        </div>
+
+        <div class="panels-grid">
+
+            <div class="panel reveal">
+                <div class="panel-header">
+                    <span class="panel-title">Réseaux configurés</span>
+                    <a href="html/config.html" class="panel-link">Gérer →</a>
+                </div>
+                <div class="panel-body" id="panel-networks">
+                    <div class="panel-empty">Chargement…</div>
+                </div>
+            </div>
+
+            <div class="panel reveal">
+                <div class="panel-header">
+                    <span class="panel-title">Profils de scan</span>
+                    <a href="html/config.html" class="panel-link">Configurer →</a>
+                </div>
+                <div class="panel-body" id="panel-profiles">
+                    <div class="panel-empty">Chargement…</div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <footer class="footer">
+        © 2026 Orion — Cartographie &amp; supervision réseau
+    </footer>
+
+    <script src="js/index.js" defer></script>
+</body>
+</html>

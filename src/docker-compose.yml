@@ -1,0 +1,85 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: orion_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: orion_admin
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: orion_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./DB:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U orion_admin -d orion_db -t 5 && psql -U orion_admin -d orion_db -c 'SELECT 1;' > /dev/null"]
+      interval: 5s
+      timeout: 10s
+      retries: 30
+      start_period: 60s
+    networks:
+      - orion-net
+
+  api:
+    build:
+      context: ./API
+      dockerfile: Dockerfile.api
+    container_name: orion_api
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: ${API_PORT}
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: orion_admin
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: orion_db
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    networks:
+      - orion-net
+    expose:
+      - "3000"
+
+  web:
+    build:
+      context: ./WEB
+      dockerfile: Dockerfile.web
+    container_name: orion_web
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # Certificat généré/importé par orion-control ssl → monté en lecture/écriture
+      # pour que l'entrypoint.sh puisse copier le cert de secours si le dossier est vide.
+      # L'entrypoint bascule automatiquement sur le cert intégré à l'image si aucun
+      # fichier n'est présent dans ce dossier.
+      - ${ORION_SSL_DIR:-/etc/orion/ssl}:/etc/nginx/ssl
+    depends_on:
+      - api
+    networks:
+      - orion-net
+
+  clt:
+    build:
+      context: ./CLT
+      dockerfile: Dockerfile.clt
+    container_name: orion_clt
+    restart: unless-stopped
+    depends_on:
+      - api
+    networks:
+      - orion-net
+    command: ["python", "-m", "orion_scanner.collector_daemon"]
+    environment:
+      DATABASE_URL: postgresql+psycopg2://orion_admin:${POSTGRES_PASSWORD}@db:5432/orion_db
+
+networks:
+  orion-net:
+    driver: bridge
+
+volumes:
+  postgres_data:

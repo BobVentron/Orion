@@ -1,0 +1,183 @@
+/* ══════════════════════════════════════════════════════════
+   shared.css — Variables, reset & composants UI génériques
+   Orion · DuckInc
+══════════════════════════════════════════════════════════ */
+
+/* ── Palette DuckInc / Canard ── */
+:root {
+  /* Fond clair teinté canard */
+  --bg:         #f0f6f6;
+  --surface:    #ffffff;
+  --surface2:   #f4fafa;
+  --surface3:   #e8f5f5;
+  --surface4:   #dceeed;
+
+  /* Bordures */
+  --border:     #c8e0e0;
+  --border2:    #9ccaca;
+
+  /* Canard — palette DuckInc */
+  --duck:       #008080;
+  --duck2:      #009999;
+  --duck3:      #006666;
+  --duck-dark:  #005959;
+  --duck-deeper:#e0f4f4;
+  --duck-glow:  rgba(0,128,128,0.18);
+  --duck-glow2: rgba(0,128,128,0.08);
+
+  /* Alias compat */
+  --accent:       #008080;
+  --accent2:      #006666;
+  --accent-glow:  rgba(0,128,128,0.15);
+
+  /* États */
+  --green:      #16a34a;
+  --red:        #dc2626;
+  --orange:     #ea580c;
+  --yellow:     #ca8a04;
+
+  /* Texte */
+  --text:       #0d2626;
+  --text2:      #2d6060;
+  --text3:      #5a9090;
+
+  /* Layout */
+  --panel:      340px;
+  --toolbar-h:  50px;
+  --radius:     8px;
+  --font:       'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  --font-ui:    system-ui, -apple-system, sans-serif;
+}
+
+/* ── Reset & base ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
+}
+
+/* ── Titre de section ── */
+.section-title {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text3);
+  margin: 18px 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* ── Onglets ── */
+.tabs-wrap {
+  padding: 10px 12px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.tabs {
+  display: flex; gap: 3px;
+  background: var(--bg);
+  border-radius: 7px; padding: 3px;
+  border: 1px solid var(--border);
+}
+.tab-btn {
+  flex: 1; padding: 6px 4px;
+  background: none; border: none;
+  color: var(--text3);
+  font-size: 10px; font-family: var(--font-ui);
+  font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer; border-radius: 5px; transition: all .2s;
+}
+.tab-btn.active {
+  background: var(--duck);
+  color: #fff;
+  box-shadow: 0 2px 6px var(--duck-glow);
+}
+.tab-btn:not(.active):hover { color: var(--duck); background: var(--duck-deeper); }
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
+
+/* ── Formulaires ── */
+.form-group { margin-bottom: 10px; }
+label {
+  display: block; font-size: 10px; color: var(--text3);
+  margin-bottom: 4px; font-weight: 700;
+  letter-spacing: .5px; text-transform: uppercase;
+}
+input[type=text], textarea, select {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  padding: 7px 10px;
+  outline: none;
+  transition: border-color .2s;
+}
+input[type=text]:focus, textarea:focus, select:focus {
+  border-color: var(--duck);
+  box-shadow: 0 0 0 2px var(--duck-glow2);
+}
+textarea { resize: vertical; min-height: 60px; }
+select option { background: var(--surface); }
+
+/* ── Boutons ── */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 14px;
+  border-radius: 6px; border: none;
+  font-size: 12px; font-weight: 600; letter-spacing: .3px;
+  cursor: pointer; transition: all .2s;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--duck) 0%, var(--duck2) 100%);
+  color: white;
+}
+.btn-primary:hover { opacity: 0.9; box-shadow: 0 4px 16px var(--duck-glow); }
+.btn-secondary {
+  background: var(--surface3);
+  color: var(--text2);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover { border-color: var(--duck); color: var(--duck2); }
+.btn-danger { background: #3d0f0f; color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+.btn-danger:hover { background: var(--red); color: white; }
+.btn-full { width: 100%; justify-content: center; }
+
+/* ── Bouton icône ── */
+.icon-btn {
+  width: 26px; height: 26px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text3);
+  cursor: pointer;
+  font-size: 11px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+}
+.icon-btn:hover { border-color: var(--duck); color: var(--duck2); }
+
+/* ── Badge ── */
+.badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 18px; height: 18px;
+  background: var(--duck); color: white;
+  font-size: 10px; font-weight: 700;
+  border-radius: 9px; padding: 0 5px;
+}
+
+/* ── Points de statut ── */
+.status-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.status-dot.online  { background: var(--green); box-shadow: 0 0 4px var(--green); }
+.status-dot.offline { background: var(--red); }
+.status-dot.unknown { background: var(--text3); }

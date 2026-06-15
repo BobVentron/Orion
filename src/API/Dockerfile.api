@@ -1,0 +1,37 @@
+# =============================================================================
+# Dockerfile pour API Orion - Node.js 
+# =============================================================================
+
+# ─── Image de base officielle Node.js FIPS ────────────────────────────────
+FROM node:25-bookworm-slim
+
+# ─── Sécurité de base ─────────────────────────────────────────────────────
+# On travaille en non-root dès le départ
+RUN useradd -m -r orion && \
+    mkdir -p /API && \
+    chown orion:orion /API
+
+WORKDIR /API
+
+# ─── Installation des dépendances en premier (meilleur caching) ─────────────
+COPY --chown=orion:orion package*.json ./
+
+# On installe les dépendances en mode production (pas de devDependencies)
+RUN npm ci --omit=dev --ignore-scripts && \
+    npm cache clean --force
+
+# ─── Copie du code source ─────────────────────────────────────────────────
+COPY --chown=orion:orion . .
+
+# ─── Port exposé (change selon ton API) ───────────────────────────────────
+EXPOSE 3000
+
+# ─── Utilisateur non-root pour exécution ──────────────────────────────────
+USER orion
+
+# ─── Variables d'environnement par défaut ─────────────────────────────────
+ENV NODE_ENV=production \
+    PORT=3000
+
+# ─── Commande de démarrage ────────────────────────────────────────────────
+CMD ["npm", "start"]

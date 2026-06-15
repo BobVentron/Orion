@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orion - Liste d'équipement</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/shared.css">
+    <link rel="stylesheet" href="../css/list.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="site-name" style="padding:0; margin-right:40px;">
+            <img src="../assets/icon.svg" alt="Orion Logo" style="height:36px; width:auto; vertical-align:middle; display:block;" />
+        </div>
+        <ul>
+            <li><a href="../index.html">Accueil</a></li>
+            <li><a href="../html/carto.html">Cartographie</a></li>
+            <li class="accordion-menu">
+                <span class="accordion-link" tabindex="0">Liste d'équipement ▼</span>
+                <ul class="submenu">
+                    <li><a href="../html/list.html">Tout</a></li>
+                    <li><a href="../html/list.html">Endpoint</a></li>
+                    <li><a href="../html/list.html">Réseaux</a></li>
+                </ul>
+            </li>
+            <li><a href="../html/config.html">Paramétrage</a></li>
+        </ul>
+    </nav>
+
+    <!-- Contenu de la page liste d'équipement -->
+
+    <div class="content-container">
+        <h1>Liste d'équipement</h1>
+
+        <!-- Barre de recherche -->
+        <div class="search-container">
+            <input type="text" id="search-input" class="search-input" placeholder="🔍 Rechercher un équipement...">
+            <button id="clear-search" class="clear-search-btn">×</button>
+        </div>
+
+        <!-- Message de chargement -->
+        <div id="loading-message" class="loading-message">
+            <div class="canard-text">🦆 Canard chercheur en action...</div>
+        </div>
+
+        <!-- Template -->
+        <template id="equipement-template">
+            <div class="equipement-ligne">
+                <div class="equipement-info">
+                    <span class="equipement-nom"></span>
+                    <span class="equipement-categorie"></span>
+                    <span class="equipement-status"></span>
+                </div>
+            </div>
+        </template>
+
+        <!-- Skeleton -->
+        <div id="skeleton-container" class="skeleton-container">
+            <div class="skeleton-ligne">
+                <div class="skeleton-info">
+                    <div class="skeleton-nom"></div>
+                    <div class="skeleton-categorie"></div>
+                    <div class="skeleton-status"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Liste -->
+        <div id="liste-equipements" class="liste-equipements"></div>
+    </div>
+
+    <!-- MODAL -->
+    <div id="modal-details" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Détails</h2>
+                <button class="modal-close" id="close-modal">&times;</button>
+            </div>
+            <div id="modal-body" class="modal-body"></div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        © 2026 Orion — Cartographie &amp; supervision réseau
+    </footer>
+
+    <script src="../js/list.js"></script>
+</body>
+</html>

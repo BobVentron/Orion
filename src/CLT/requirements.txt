@@ -1,0 +1,14 @@
+# --- Base de données ---
+SQLAlchemy>=2.0.0,<3.0.0
+psycopg2-binary>=2.9.9
+python-dotenv>=1.0.0
+
+# --- Réseau ---
+netmiko>=4.4.0
+
+# --- SNMP ---
+pysnmp-lextudio>=6.0.0
+pysmi-lextudio>=1.0.0  
+
+# --- Utilitaires ---
+netaddr>=1.0.0

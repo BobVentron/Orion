@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "orion-scanner"
+version = "0.3.0"
+description = "SNMP network discovery and monitoring for Orion NMS"
+requires-python = ">=3.11"
+dependencies = [
+    "SQLAlchemy>=2.0.0,<3.0.0",
+    "psycopg2-binary>=2.9.9",
+    "python-dotenv>=1.0.0",
+    "pysnmp-lextudio>=6.0.0",
+    "pysmi-lextudio>=1.0.0",
+    "netaddr>=1.0.0",
+]
+
+[project.scripts]
+orion        = "orion_scanner.cli:main"
+orion-daemon = "orion_scanner.collector_daemon:run"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["orion_scanner*"]
