@@ -1,8 +1,8 @@
 # 🌟 Orion — Outil de Cartographie Réseau
 
 > **Projet PTUT — Duck Inc.**  
-> Bastien Soleilhac · Alexis Lonjon · Michel Bermond · Jade [...]  
-> IUT — Réseaux & Télécommunications | 2024–2025
+> Bastien Soleilhac · Alexis Lonjon · Michel Bermond · Jade Degaugue 
+> IUT — Réseaux & Télécommunications | 2025–2026
 
 ---
 
@@ -174,14 +174,14 @@ Le scanner Python (`src/CLT/app/orion_scanner/snmp/`) implémente la découverte
 
 | Membre | Rôle principal |
 |--------|---------------|
-| Bastien Soleilhac | Architecture, CLT/scanner, packaging Debian, déploiement |
-| Alexis Lonjon | Frontend, API, intégration |
+| Bastien Soleilhac | Architecture, API, packaging Debian, déploiement |
+| Alexis Lonjon | Frontend, CLT/scanner, intégration |
 | Michel Bermond | Frontend, intégration, documentation |
-| Jade [...] | Documentation, présentation, pitch |
+| Jade Degaugue | Documentation, présentation, pitch |
 
 ---
 
 ## Licence
 
 Projet académique — PTUT BUT3 R&T.  
-© 2024–2025 Duck Inc. Tous droits réservés.
+© 2025–2026 Duck Inc. Tous droits réservés.
